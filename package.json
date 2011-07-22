@@ -1,0 +1,51 @@
+{
+  "name": "waldo",
+  "version": "0.1.337",
+  "description": "An object crawler/property search library that works on nearly all JavaScript platforms.",
+  "homepage": "https://github.com/bestiejs/waldo",
+  "main": "find",
+  "keywords": [
+    "crawl",
+    "find",
+    "search",
+    "utility"
+  ],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://mths.be/mit"
+    }
+  ],
+  "author": {
+    "name": "John-David Dalton",
+    "email": "john@fusejs.com",
+    "web": "http://allyoucanleet.com/"
+  },
+  "maintainers": [
+    {
+      "name": "Angus Croll",
+      "email": "anguscroll@gmail.com",
+      "web": "http://javascriptweblog.wordpress.com/"
+    },
+    {
+      "name": "John-David Dalton",
+      "email": "john@fusejs.com",
+      "web": "http://allyoucanleet.com/"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/bestiejs/waldo/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bestiejs/waldo.git"
+  },
+  "engines": [
+    "node",
+    "rhino"
+  ],
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  }
+}
