@@ -7,11 +7,11 @@
 
 ## `find`
 * [`find`](#find)
+* [`find.debug`](#find.debug)
 * [`find.byKind`](#find.byKind)
 * [`find.byName`](#find.byName)
 * [`find.byValue`](#find.byValue)
 * [`find.custom`](#find.custom)
-* [`find.debug`](#find.debug)
 
 <!-- /div -->
 
@@ -28,7 +28,7 @@
 
 <!-- div -->
 
-### <a id="find" href="https://github.com/bestiejs/waldo.js/blob/master/find.js#L428" title="View in source">`find`</a>
+### <a id="find" href="https://github.com/bestiejs/waldo.js/blob/master/waldo.js#L484" title="View in source">`find`</a>
 *(Object)*: The primary namespace.
 [&#9650;][1]
 
@@ -37,15 +37,17 @@
 
 <!-- div -->
 
-## `find`
-### <a id="find" href="https://github.com/bestiejs/waldo.js/blob/master/find.js#L428" title="View in source">`find`</a>
-*(Object)*: The primary namespace.
+### <a id="find.debug" href="https://github.com/bestiejs/waldo.js/blob/master/waldo.js#L491" title="View in source">`find.debug`</a>
+*(Boolean)*: A flag to indicate that methods will execute in debug mode.
 [&#9650;][1]
+
+<!-- /div -->
+
 
 <!-- div -->
 
-### <a id="find.byKind" href="https://github.com/bestiejs/waldo.js/blob/master/find.js#L360" title="View in source">`find.byKind(kind [, options={}])`</a>
-*(Unknown)*: Crawls environment objects logging all object properties whose values
+### <a id="find.byKind" href="https://github.com/bestiejs/waldo.js/blob/master/waldo.js#L416" title="View in source">`find.byKind(kind [, options={}])`</a>
+Crawls environment objects logging all object properties whose values
 [&#9650;][1]
 
 #### Arguments
@@ -72,8 +74,8 @@ find.byKind('constructor');
 
 <!-- div -->
 
-### <a id="find.byName" href="https://github.com/bestiejs/waldo.js/blob/master/find.js#L381" title="View in source">`find.byName(name [, options={}])`</a>
-*(Unknown)*: Crawls environment objects logging all object properties of the specified name.
+### <a id="find.byName" href="https://github.com/bestiejs/waldo.js/blob/master/waldo.js#L437" title="View in source">`find.byName(name [, options={}])`</a>
+Crawls environment objects logging all object properties of the specified name.
 [&#9650;][1]
 
 #### Arguments
@@ -98,8 +100,8 @@ find.byName('map', { 'object': jQuery, 'path': '$' });
 
 <!-- div -->
 
-### <a id="find.byValue" href="https://github.com/bestiejs/waldo.js/blob/master/find.js#L399" title="View in source">`find.byValue(value [, options={}])`</a>
-*(Unknown)*: Crawls environment objects logging all object properties whose values are
+### <a id="find.byValue" href="https://github.com/bestiejs/waldo.js/blob/master/waldo.js#L455" title="View in source">`find.byValue(value [, options={}])`</a>
+Crawls environment objects logging all object properties whose values are
 [&#9650;][1]
 
 #### Arguments
@@ -120,12 +122,12 @@ find.byValue(0);
 
 <!-- div -->
 
-### <a id="find.custom" href="https://github.com/bestiejs/waldo.js/blob/master/find.js#L418" title="View in source">`find.custom(callback [, options={}])`</a>
-*(Unknown)*: Crawls environment objects executing `callback`, passing the current
+### <a id="find.custom" href="https://github.com/bestiejs/waldo.js/blob/master/waldo.js#L474" title="View in source">`find.custom(callback [, options={}])`</a>
+Crawls environment objects executing `callback`, passing the current
 [&#9650;][1]
 
 #### Arguments
-1. `callback` *(Function)*: The function executed per object.
+1. `callback` *(Function)*: A function executed per object.
 2. `[options={}]` *(Object)*: The options object.
 
 #### Example
@@ -136,15 +138,6 @@ find.custom(function(value, key) { return key.indexOf('oo') > -1; });
 // or filter by falsey values
 find.custom(function(value) { return !value; });
 ~~~
-
-<!-- /div -->
-
-
-<!-- div -->
-
-### <a id="find.debug" href="https://github.com/bestiejs/waldo.js/blob/master/find.js#L435" title="View in source">`find.debug`</a>
-*(Boolean)*: A flag to indicate that methods will execute in debug mode.
-[&#9650;][1]
 
 <!-- /div -->
 

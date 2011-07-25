@@ -6,9 +6,14 @@
  */
 ;(function(window, undefined) {
 
+  /* Used as the starting point(s) for the object crawler */
+  var defaultRoots = [{ 'object': window, 'path': 'window' }],
+
   /** Detect free variable `exports` */
-  var freeExports = typeof exports == 'object' && exports &&
-    (isHostType(this, 'global') && (window = global), exports),
+  freeExports = typeof exports == 'object' && exports,
+
+  /** Detect free variable `global` */
+  freeGlobal = typeof global == 'object' && global && (global == global.global ? (window = global) : global),
 
   /** Used in case an object doesn't have its own method */
   hasOwnProperty = {}.hasOwnProperty,
@@ -25,7 +30,7 @@
     'kind': function(value, key, object) {
       var kind = [value, value = object[key]][0];
       return isFunction(kind) ? value instanceof kind :
-        getKindOf(value).toLowerCase() == kind.toLowerCase();
+        typeof value == kind || getKindOf(value).toLowerCase() == kind.toLowerCase();
     },
     'name': function(value, key, object) {
       return value == key;
@@ -38,10 +43,25 @@
   /*--------------------------------------------------------------------------*/
 
   /**
+   * Returns the first array value for which `callback` returns true.
+   * @private
+   * @param {Array} array The array to search.
+   * @param {Function} callback A function executed per array value .
+   * @returns {Mixed} The filtered value.
+   */
+  function filterOne(array, callback) {
+    for (var index = 0, length = array.length; index < length; index++) {
+      if (index in array && callback(array[index], index, array)) {
+        return array[index];
+      }
+    }
+  }
+
+  /**
    * Iterates over an object's own properties, executing the `callback` for each.
    * @private
    * @param {Object} object The object to iterate over.
-   * @param {Function} callback The function executed per own property.
+   * @param {Function} callback A function executed per own property.
    * @param {Mixed} [owner=null] The owner of the `object`.
    */
   function forIn() {
@@ -112,6 +132,25 @@
   }
 
   /**
+   * Mimics the ES 5.1 `Object.prototype.toString` behavior and returns
+   * the value's [[Class]], "Null" or "Undefined".
+   * @private
+   * @param {Mixed} value The value to check.
+   * @returns {String} Returns the value's [[Class]] or "Null" or "Undefined".
+   */
+  function getKindOf(value) {
+    var result;
+    if (value == null) {
+      result = value === null ? 'Null' : 'Undefined';
+    }
+    else if (isFunction(value)) {
+      // a function is of kind "Constructor" if it has its own enumerable prototype properties
+      forIn(value.prototype, function() { return !(result = 'Constructor'); }, value);
+    }
+    return result || toString.call(value).slice(8, -1);
+  }
+
+  /**
    * Checks if an object has the specified key as a direct property.
    * @private
    * @param {Object} object The object to check.
@@ -153,25 +192,6 @@
       };
     }
     return hasKey.apply(null, arguments);
-  }
-
-  /**
-   * Mimics the ES 5.1 `Object.prototype.toString` behavior and returns
-   * the value's [[Class]], "Null" or "Undefined".
-   * @private
-   * @param {Mixed} value The value to check.
-   * @returns {String} Returns the value's [[Class]] or "Null" or "Undefined".
-   */
-  function getKindOf(value) {
-    var result;
-    if (value == null) {
-      result = value === null ? 'Null' : 'Undefined';
-    }
-    else if (isFunction(value)) {
-      // a function is of kind "Constructor" if it has its own enumerable prototype properties
-      forIn(value.prototype, function() { return !(result = 'Constructor'); }, value);
-    }
-    return result || toString.call(value).slice(8, -1);
   }
 
   /**
@@ -229,13 +249,14 @@
     var result = (!expected || RegExp('^(?:' + expected + ')$').test(typeof value))
       ? crawl(name, value, options)
       : (log('error', '`' + value + '` must be a ' + expected.split('|').join(' or ')), null);
+
     return find.debug ? result : undefined;
   }
 
   /**
    * Crawls environment objects logging all properties that pass the callback filter.
    * @private
-   * @param {Function|String} callback A callback executed per object encountered.
+   * @param {Function|String} callback A function executed per object encountered.
    * @param {Mixed} callbackArg An argument passed to the callback.
    * @param {Object} [options={}] The options object.
    * @returns {Array} An array of arguments passed to each `console.log()` call.
@@ -245,59 +266,75 @@
     options || (options = {});
 
     var data,
+        owner,
         pool,
         pooled,
+        queue,
         separator,
-        object = options.object || window,
-        path = options.path == null ? (object == window ? 'window' : '<object>') : options.path,
-        owner = /(?:^|[\W_])prototype[\W_]*$/i.test(path) && callback,
-        queue = [{ 'object': object, 'path': path, 'pool': [object] }],
+        roots = defaultRoots.slice(),
+        object = options.object || roots[0].object,
+        path = options.path,
         result = [];
 
-    // a non-recursive solution to avoid call stack limits
-    // http://www.jslab.dk/articles/non.recursive.preorder.traversal.part4
-    while ((data = queue.pop())) {
+    // resolve undefined path
+    if (path == null) {
+      path = (filterOne(roots, function(data) { return object == data.object; }) || { 'path': '<object>' }).path;
+    }
+    // resolve object roots
+    if (options.object) {
+      roots = [{ 'object': object, 'path': path }];
+    }
+    // crawl all root objects
+    while ((data = roots.pop())) {
       object = data.object;
       path = data.path;
-      separator = path ? '.' : '';
+      queue = [{ 'object': object, 'path': path, 'pool': [object] }];
+      owner = /(?:^|[\W_])prototype[\W_]*$/i.test(path) && callback;
 
-      forIn(object, function(value, key) {
-        // inspect objects
-        if (isObject(value)) {
-          // clone current pool per prop on the current `object` to avoid siblings
-          // polluting each others object pools
-          pool = data.pool.slice();
+      // a non-recursive solution to avoid call stack limits
+      // http://www.jslab.dk/articles/non.recursive.preorder.traversal.part4
+      while ((data = queue.pop())) {
+        object = data.object;
+        path = data.path;
+        separator = path ? '.' : '';
 
-          // check if already pooled (prevents circular references)
-          // console.log('debug:', path, key, data.pool.length, data.pool.slice());
-          pooled = false;
-          for (var i = -1; pool[++i] && !(pooled = pool[i].object == value && pool[i]); ) { }
+        forIn(object, function(value, key) {
+          // inspect objects
+          if (isObject(value)) {
+            // clone current pool per prop on the current `object` to avoid siblings
+            // polluting each others object pools
+            pool = data.pool.slice();
 
-          // add to "call" queue
-          if (!pooled) {
-            pool.push({ 'object': value, 'path': path + separator + key, 'pool': pool });
-            queue.push(pool[pool.length - 1]);
+            // check if already pooled (prevents circular references)
+            // console.log('debug:', path, key, data.pool.length, data.pool.slice());
+            pooled = filterOne(pool, function(data) { return value == data.object; });
+
+            // add to "call" queue
+            if (!pooled) {
+              pool.push({ 'object': value, 'path': path + separator + key, 'pool': pool });
+              queue.push(pool[pool.length - 1]);
+            }
           }
-        }
-        // if filter passed, log it
-        // (IE may throw errors accessing/coercing properties)
-        try {
-          if (callback.call(data, callbackArg, key, object)) {
-            result.push([
-              path + separator + key + ' -> (' +
-              (pooled ? '<' + pooled.path + '>' : getKindOf(value).toLowerCase()) + ')',
-              value
-            ]);
+          // if filter passed, log it
+          // (IE may throw errors accessing/coercing properties)
+          try {
+            if (callback.call(data, callbackArg, key, object)) {
+              result.push([
+                path + separator + key + ' -> (' +
+                (pooled ? '<' + pooled.path + '>' : getKindOf(value).toLowerCase()) + ')',
+                value
+              ]);
 
-            log('text', result[result.length - 1][0], value);
-          }
-        } catch(e) { }
-      },
-      // attempt to handle an edge cause where a function prototype is provided
-      // via `options.object` by guesstimating, based on it's `options.path` to
-      // be a function prototype then supply a dummy function to trigger
-      // `forIn()`'s `skipCtor` flag.
-      data.pool.length == 1 && owner);
+              log('text', result[result.length - 1][0], value);
+            }
+          } catch(e) { }
+        },
+        // attempt to handle an edge cause where a function prototype is provided
+        // via `options.object` by guesstimating, based on it's `options.path` to
+        // be a function prototype then supply a dummy function to trigger
+        // `forIn()`'s `skipCtor` flag.
+        data.pool.length == 1 && owner);
+      }
     }
     return result;
   }
@@ -311,7 +348,8 @@
    */
   function log() {
     var defaultCount = 2,
-        console = isHostType(window, 'console') && window.console;
+        console = typeof window.console == 'object' && window.console,
+        JSON = typeof window.JSON == 'object' && isFunction(window.JSON && window.JSON.stringify) && window.JSON;
 
     // lazy define
     log = function(type, message, value) {
@@ -320,19 +358,28 @@
 
       if (type == 'error') {
         argCount = 1;
-        if (isHostType(console, 'error')) {
+        if (isHostType(console, type)) {
           method = type;
         } else {
           message = type + ': ' + message;
         }
       }
-      // because `console.log` is a host method we don't assume `.apply()` exists
-      if (argCount < 2) {
-        console[method](message);
-      } else {
-        console[method](message, value);
+      // avoid logging if in debug mode and running from the CLI
+      if (typeof document == 'object' && document || !find.debug) {
+        // because `console.log` is a host method we don't assume `.apply()` exists
+        if (argCount < 2) {
+          value = JSON ? JSON.stringify(value) : value;
+          console[method](message + (type == 'error' ? '' : ' ' + value));
+        } else {
+          console[method](message, value);
+        }
       }
     };
+
+    // for Narwhal, Rhino or Ringo
+    if (!console && isFunction(window.print)) {
+      console = { 'log': print };
+    }
     // use noop for no log support
     if (!isHostType(console, 'log')) {
       log = function() { };
@@ -414,7 +461,7 @@
    * `value`, `key`, and `object` as arguments, against each object encountered
    * and logs properties for which `callback` returns true.
    * @memberOf find
-   * @param {Function} callback The function executed per object.
+   * @param {Function} callback A function executed per object.
    * @param {Object} [options={}] The options object.
    * @example
    *
@@ -432,14 +479,14 @@
 
   /**
    * The primary namespace.
-   * @type {Object}
+   * @type Object
    */
   var find = {
 
     /**
      * A flag to indicate that methods will execute in debug mode.
      * @memberOf find
-     * @type {Boolean}
+     * @type Boolean
      */
     'debug': false,
 
@@ -458,12 +505,26 @@
 
   /*--------------------------------------------------------------------------*/
 
+  // mod `defaultRoots` for server-side environments
+  // for Narwhal, Node.js or Ringo
+  if (freeGlobal && freeExports) {
+    defaultRoots = [
+      { 'object': freeExports, 'path': 'exports' },
+      { 'object': freeGlobal, 'path': 'global' }
+    ];
+  }
+  // for Rhino
+  else if (typeof environment == 'object' && getKindOf(environment) == 'Environment') {
+    defaultRoots[0].path = '<global object>';
+  }
+
+  /*--------------------------------------------------------------------------*/
+
   // expose find
+  // in Narwhal, Node.js or Ringo
   if (freeExports) {
-    // in Narwhal, Node.js or Ringo
-    for (var key in find) {
-      freeExports[key] = find[key];
-    }
+    forIn(find, function(value, key) { freeExports[key] = value; });
+    find = freeExports;
   }
   // via curl.js or RequireJS
   else if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {

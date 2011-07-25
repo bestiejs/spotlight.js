@@ -1,5 +1,21 @@
 (function(window, undefined) {
 
+  /** Load QUnit's CLI boilerplate */
+  (window.QUnit && function(){} ||
+   typeof require == 'function' && require ||
+   typeof load == 'function' && load)('../vendor/qunit-clib/qunit-clib.js');
+
+  /** The `find` object to test */
+  var find =
+    window.find ||
+    typeof require == 'function' && require('../waldo.js') ||
+    typeof load == 'function' && (load('../waldo.js'), window.find);
+
+  /** The root name for the environment */
+  var rootName =
+    typeof global == 'object' && global ? 'global' :
+    typeof environment == 'object' ? '<global object>' : 'window';
+
   /**
    * Simplifies the debug return values of `find` methods by filtering non-log messages.
    * @private
@@ -16,9 +32,12 @@
 
   /*--------------------------------------------------------------------------*/
 
-  module('Waldo');
-
+  // enable debug mode so `find` methods return an array of log calls
   find.debug = true;
+
+  // must explicitly use `QUnit.module` instead of `module()`
+  // in case we are in a CLI environment
+  QUnit.module('Waldo');
 
   test('method options', function() {
     window.a = { 'a': { 'a': { 'b': { 'c': 12 } } } };
@@ -43,18 +62,25 @@
     window.a = { 'b': { 'c': new Klass } };
 
     var result = simplify(find.byKind(Klass));
-    var expected = ['window.a.b.c -> (object)'];
+    var expected = [rootName + '.a.b.c -> (object)'];
     deepEqual(result, expected, 'Klass instance');
 
     window.a = { 'b': { 'c': [] } };
 
-    result = simplify(find.byKind('array', { 'object': a }));
-    expected = ['<object>.b.c -> (array)'];
-    deepEqual(result, expected, 'array');
-
     result = simplify(find.byKind('Array', { 'object': a }));
     expected = ['<object>.b.c -> (array)'];
-    deepEqual(result, expected, 'capitalized type');
+    deepEqual(result, expected, '[[Class]]');
+
+    result = simplify(find.byKind('array', { 'object': a }));
+    expected = ['<object>.b.c -> (array)'];
+    deepEqual(result, expected, 'lowercase [[Class]]');
+
+    result = simplify(find.byKind('object', { 'object': a.b }));
+    expected = ['<object>.c -> (array)'];
+    deepEqual(result, expected, 'typeof');
+
+    result = simplify(find.byKind('Object', { 'object': a.b }));
+    deepEqual(result, [], 'no-match [[Class]]');
 
     window.a = { 'b': { 'c': null } };
 
@@ -78,22 +104,22 @@
     window.a = { 'b': { 'c': 12 } };
 
     var result = simplify(find.byName('c'));
-    var expected = ['window.a.b.c -> (number)'];
+    var expected = [rootName + '.a.b.c -> (number)'];
     deepEqual(result, expected, 'basic');
 
     window.a = { 'a': { 'a': { 'b': { 'c': 12 } } } };
 
     result = simplify(find.byName('c'));
-    expected = ['window.a.a.a.b.c -> (number)'];
+    expected = [rootName + '.a.a.a.b.c -> (number)'];
     deepEqual(result, expected, 'repeated property names');
 
     window.a = { 'foo': { 'b': { 'foo': { 'c': { 'foo': 12 } } } } };
 
     result = simplify(find.byName('foo'));
     expected = [
-      'window.a.foo -> (object)',
-      'window.a.foo.b.foo -> (object)',
-      'window.a.foo.b.foo.c.foo -> (number)'
+      rootName + '.a.foo -> (object)',
+      rootName + '.a.foo.b.foo -> (object)',
+      rootName + '.a.foo.b.foo.c.foo -> (number)'
     ];
 
     deepEqual(result, expected, 'multiple matches');
@@ -104,9 +130,9 @@
     // qunit can't handle circular references :/
     result = simplify(find.byName('foo'));
     expected = [
-      'window.a.foo -> (object)',
-      'window.a.foo.b.foo -> (object)',
-      'window.a.foo.b.foo.c.foo -> (<window.a>)'
+      rootName + '.a.foo -> (object)',
+      rootName + '.a.foo.b.foo -> (object)',
+      rootName + '.a.foo.b.foo.c.foo -> (<' + rootName + '.a>)'
     ];
 
     deepEqual(result, expected, 'circular references');
@@ -122,7 +148,7 @@
     window.a = { 'b': { 'c': value } };
 
     var result = simplify(find.byValue(value));
-    var expected = ['window.a.b.c -> (string)'];
+    var expected = [rootName + '.a.b.c -> (string)'];
     deepEqual(result, expected, 'basic');
 
     window.a = { 'b': { 'c': 12 } };
@@ -138,7 +164,7 @@
     window.a = { 'b': { 'c': +now } };
 
     var result = simplify(find.custom(function(value) { return value == now }));
-    var expected = ['window.a.b.c -> (number)'];
+    var expected = [rootName + '.a.b.c -> (number)'];
     deepEqual(result, expected, 'basic');
 
     find.custom(function() { result = [].slice.call(arguments); }, { 'object': a.b });
@@ -178,15 +204,22 @@
     window.a = { };
 
     result = simplify(find.byName('a', { 'object': window.window }));
-    expected = ['window.a -> (object)'];
+    expected = [rootName + '.a -> (object)'];
     deepEqual(result, expected, 'Opera < 10.53 window');
   });
 
   /*--------------------------------------------------------------------------*/
 
-  if (window.require != null) {
+  if (typeof document == 'object' && window.require != null) {
     test('require("find")', function() {
       strictEqual((find2 || { }).debug, false, 'require("find")');
     });
   }
-}(this));
+
+  /*--------------------------------------------------------------------------*/
+
+  // explicitly call `QUnit.start()` in a CLI environment
+  if (typeof document != 'object') {
+    QUnit.start();
+  }
+}(typeof global == 'object' && global || this));

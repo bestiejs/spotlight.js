@@ -7,3 +7,6 @@
 [submodule "vendor/requirejs"]
 	path = vendor/requirejs
 	url = git://github.com/jrburke/requirejs.git
+[submodule "vendor/qunit-clib"]
+	path = vendor/qunit-clib
+	url = git://github.com/jdalton/qunit-clib.git

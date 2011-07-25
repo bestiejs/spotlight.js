@@ -5,7 +5,7 @@
 		<link rel="stylesheet" href="../vendor/qunit/qunit/qunit.css">
 		<script src="../vendor/qunit/qunit/qunit.js"></script>
 		<script>var find2;</script>
-		<script src="../find.js"></script>
+		<script src="../waldo.js"></script>
 		<script src="../vendor/requirejs/require.js"></script>
 		<script>
 		if (/[?&]norequire=true(?:&|$)/.test(location.search)) {
@@ -18,7 +18,7 @@
 				'urlArgs': 't=' + (+new Date),
 				'paths': { 'src': '../../' }
 			},
-			['src/find'], function(find) {
+			['src/waldo'], function(find) {
 				find2 = find;
 				require(['tests.js']);
 			});
