@@ -1,15 +1,18 @@
 (function(window, undefined) {
 
-  /** Load QUnit's CLI boilerplate */
-  (window.QUnit && function(){} ||
-   typeof require == 'function' && require ||
-   typeof load == 'function' && load)('../vendor/qunit-clib/qunit-clib.js');
+  /** Use a single load function */
+  var load = typeof require == 'function' ? require : window.load;
+
+  /** The unit testing framework */
+  var QUnit =
+    window.QUnit ||
+    (window.QUnit = load('../vendor/qunit/qunit/qunit.js') || window.QUnit) &&
+    (load('../vendor/qunit-clib/qunit-clib.js'), window.QUnit);
 
   /** The `find` object to test */
   var find =
     window.find ||
-    typeof require == 'function' && require('../waldo.js') ||
-    typeof load == 'function' && (load('../waldo.js'), window.find);
+    (load('../waldo.js') || window.find);
 
   /** The root name for the environment */
   var rootName =
@@ -210,7 +213,7 @@
 
   /*--------------------------------------------------------------------------*/
 
-  if (typeof document == 'object' && window.require != null) {
+  if (window.document && window.require) {
     test('require("find")', function() {
       strictEqual((find2 || { }).debug, false, 'require("find")');
     });
@@ -219,7 +222,7 @@
   /*--------------------------------------------------------------------------*/
 
   // explicitly call `QUnit.start()` in a CLI environment
-  if (typeof document != 'object') {
+  if (!window.document) {
     QUnit.start();
   }
 }(typeof global == 'object' && global || this));
