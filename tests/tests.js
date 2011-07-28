@@ -215,7 +215,7 @@
 
   if (window.document && window.require) {
     test('require("find")', function() {
-      strictEqual((find2 || { }).debug, false, 'require("find")');
+      strictEqual((find2 || {}).debug, false, 'require("find")');
     });
   }
 
