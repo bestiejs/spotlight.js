@@ -101,7 +101,7 @@ Feel free to fork if you see possible improvements!
 
 ## Footnotes
 
-  1. Waldo has been tested in at least Chrome 4/8/13, Firefox 2-4, IE 6-10, Opera 9.25-11, Safari 2-5, Node.js 0.4.2, Narwhal 0.3.2, Ringo 0.7, and Rhino 1.7RC3.
+  1. Waldo has been tested in at least Chrome 12, IE 8, Opera 11, Safari 5, Node.js 0.4.2, Narwhal 0.3.2, Ringo 0.7, and Rhino 1.7RC3.
      <a name="fn1" title="Jump back to footnote 1 in the text." href="#fnref1">&#8617;</a>
 
 ## Authors
