@@ -86,14 +86,14 @@ To clone this repository including all submodules, using git 1.6.5 or later:
 
 ~~~ bash
 git clone --recursive https://github.com/bestiejs/spotlight.js.git
-cd spotlight
+cd spotlight.js
 ~~~
 
 For older git versions, just use:
 
 ~~~ bash
 git clone https://github.com/bestiejs/spotlight.js.git
-cd spotlight
+cd spotlight.js
 git submodule update --init
 ~~~
 
