@@ -1,11 +1,11 @@
 <!doctype html>
 <html>
 	<head>
-		<title>Waldo Test Suite</title>
+		<title>Spotlight.js Test Suite</title>
 		<link rel="stylesheet" href="../vendor/qunit/qunit/qunit.css">
 		<script src="../vendor/qunit/qunit/qunit.js"></script>
-		<script>var find2;</script>
-		<script src="../waldo.js"></script>
+		<script>var spotlight2;</script>
+		<script src="../spotlight.js"></script>
 		<script src="../vendor/requirejs/require.js"></script>
 		<script>
 		if (/[?&]norequire=true(?:&|$)/.test(location.search)) {
@@ -18,15 +18,15 @@
 				'urlArgs': 't=' + (+new Date),
 				'paths': { 'src': '../../' }
 			},
-			['src/waldo'], function(find) {
-				find2 = find;
+			['src/spotlight'], function(spotlight) {
+				spotlight2 = spotlight;
 				require(['tests.js']);
 			});
 		}
 		</script>
 	</head>
 	<body>
-		<h1 id="qunit-header">Waldo Test Suite</h1>
+		<h1 id="qunit-header">Spotlight.js Test Suite</h1>
 		<h2 id="qunit-banner"></h2>
 		<div id="qunit-testrunner-toolbar"></div>
 		<h2 id="qunit-userAgent"></h2>

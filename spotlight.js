@@ -29,7 +29,7 @@
     },
     'kind': function(value, key, object) {
       var kind = [value, value = object[key]][0];
-      return isFunction(kind) ? value instanceof kind :
+      return isFunction(kind) ? value === Object(value) && value instanceof kind :
         typeof value == kind || getKindOf(value).toLowerCase() == kind.toLowerCase();
     },
     'name': function(value, key, object) {
@@ -110,8 +110,25 @@
           seen = {},
           skipProto = isFunction(object);
 
+      // some objects like Firefox 3's `XPCSafeJSObjectWrapper.prototype` may
+      // throw errors when attempting to iterate over them
       object = Object(object);
+      try {
+        for (var key in object) {
+          break;
+        }
+      } catch(e) {
+        return;
+      }
+
       for (var key in object) {
+        // some properties like Firefox's `console.constructor` or IE's
+        // `element.offsetParent` may throw errors when accessed
+        try {
+          toString.call(object[key]);
+        } catch(e) {
+          continue;
+        }
         // Opera and Safari incorrectly set a function's `prototype` property
         // [[Enumerable]] value to true by default. Because of this we standardize
         // on skipping the the `prototype` property of functions regardless of
@@ -132,22 +149,34 @@
   }
 
   /**
-   * Mimics the ES 5.1 `Object.prototype.toString` behavior and returns
-   * the value's [[Class]], "Null" or "Undefined".
+   * Mimics ES 5.1's `Object.prototype.toString` behavior by returning the
+   * value's [[Class]], "Null" or "Undefined" as well as other non-spec'ed results
+   * like "Constructor" and "Global" .
    * @private
    * @param {Mixed} value The value to check.
    * @returns {String} Returns the value's [[Class]] or "Null" or "Undefined".
    */
   function getKindOf(value) {
-    var result;
+    var proto,
+        result;
+
     if (value == null) {
       result = value === null ? 'Null' : 'Undefined';
     }
-    else if (isFunction(value)) {
-      // a function is of kind "Constructor" if it has its own enumerable prototype properties
-      forIn(value.prototype, function() { return !(result = 'Constructor'); }, value);
+    else if (value == window) {
+      result = 'Global';
     }
-    return result || toString.call(value).slice(8, -1);
+    else if (isFunction(value) && isHostType(value, 'prototype')) {
+      if (toString.call(value.prototype) == '[object Object]') {
+        // a function is assumed of kind "Constructor" if it has its own enumerable
+        // prototype properties or is not an Object object
+        forIn(value.prototype, function() { return !(result = 'Constructor'); }, value);
+      } else {
+        result = 'Constructor';
+      }
+    }
+    return result || (toString.call(value).match(/^\[object (.*?)\]$/) || 0)[1] ||
+      (result = typeof value, result.charAt(0).toUpperCase() + result.slice(1))
   }
 
   /**
@@ -226,10 +255,13 @@
    * @returns {Boolean} Returns `true` if `value` is an object, else `false`.
    */
   function isObject(value) {
-    // IE < 9 presents nodes like vanilla objects:
+    // some properties throw errors when accessed
+    try {
+      var constructor = value && value.constructor;
+    } catch(e) {}
+    // IE < 9 presents nodes like Object objects:
     // IE < 8 are missing the node's constructor property
     // IE 8 node constructors are typeof "object"
-    var constructor = value && value.constructor;
     return constructor && typeof constructor != 'object' &&
       getKindOf(value) == 'Object';
   }
@@ -250,7 +282,7 @@
       ? crawl(name, value, options)
       : (log('error', '`' + value + '` must be a ' + expected.split('|').join(' or ')), null);
 
-    return find.debug ? result : undefined;
+    return spotlight.debug ? result : undefined;
   }
 
   /**
@@ -316,18 +348,17 @@
             }
           }
           // if filter passed, log it
-          // (IE may throw errors accessing/coercing properties)
+          // (IE may throw errors coercing properties like `window.external` or `window.navigator`)
           try {
             if (callback.call(data, callbackArg, key, object)) {
               result.push([
                 path + separator + key + ' -> (' +
-                (pooled ? '<' + pooled.path + '>' : getKindOf(value).toLowerCase()) + ')',
+                (true && pooled ? '<' + pooled.path + '>' : getKindOf(value).toLowerCase()) + ')',
                 value
               ]);
-
               log('text', result[result.length - 1][0], value);
             }
-          } catch(e) { }
+          } catch(e) {}
         },
         // attempt to handle an edge cause where a function prototype is provided
         // via `options.object` by guesstimating, based on it's `options.path` to
@@ -349,6 +380,7 @@
   function log() {
     var defaultCount = 2,
         console = typeof window.console == 'object' && window.console,
+        document = typeof window.document == 'object' && window.document,
         JSON = typeof window.JSON == 'object' && isFunction(window.JSON && window.JSON.stringify) && window.JSON;
 
     // lazy define
@@ -365,7 +397,7 @@
         }
       }
       // avoid logging if in debug mode and running from the CLI
-      if (typeof document == 'object' && document || !find.debug) {
+      if (document || !spotlight.debug) {
         // because `console.log` is a host method we don't assume `.apply()` exists
         if (argCount < 2) {
           value = JSON ? JSON.stringify(value) : value;
@@ -377,7 +409,7 @@
     };
 
     // for Narwhal, Rhino or Ringo
-    if (!console && isFunction(window.print)) {
+    if (!console && !document && isFunction(window.print)) {
       console = { 'log': print };
     }
     // use noop for no log support
@@ -396,22 +428,22 @@
   /**
    * Crawls environment objects logging all object properties whose values
    * are of a specified constructor instance, [[Class]], or type.
-   * @memberOf find
+   * @memberOf spotlight
    * @param {Function|String} kind The constructor, [[Class]], or type to check against.
    * @param {Object} [options={}] The options object.
    * @example
    *
    * // by constructor
-   * find.byKind(jQuery);
+   * spotlight.byKind(jQuery);
    *
    * // or by [[Class]]
-   * find.byKind('RegExp');
+   * spotlight.byKind('RegExp');
    *
    * // or by type
-   * find.byKind('undefined');
+   * spotlight.byKind('undefined');
    *
    * // or special kind "constructor"
-   * find.byKind('constructor');
+   * spotlight.byKind('constructor');
    */
   function byKind(kind, options) {
     return checkCall('kind', 'function|string', kind, options);
@@ -419,20 +451,20 @@
 
   /**
    * Crawls environment objects logging all object properties of the specified name.
-   * @memberOf find
+   * @memberOf spotlight
    * @param {String} name The property name to search for.
    * @param {Object} [options={}] The options object.
    * @example
    *
    * // basic
    * // > window.length -> (number) 0
-   * find.byName('length');
+   * spotlight.byName('length');
    *
    * // or with options
    * // (finds all "map" properties on jQuery)
    * // > $.map -> (function) function(a,b,c){...}
    * // > $.fn.map -> (function) function(a){...}
-   * find.byName('map', { 'object': jQuery, 'path': '$' });
+   * spotlight.byName('map', { 'object': jQuery, 'path': '$' });
    */
   function byName(name, options) {
     return checkCall('name', 'string', name, options);
@@ -441,7 +473,7 @@
   /**
    * Crawls environment objects logging all object properties whose values are
    * a strict match for the specified value.
-   * @memberOf find
+   * @memberOf spotlight
    * @param {Mixed} value The value to search for.
    * @param {Object} [options={}] The options object.
    * @example
@@ -450,7 +482,7 @@
    * // > window.pageXOffset -> (number) 0
    * // > window.screenX -> (number) 0
    * // > window.length -> (number) 0
-   * find.byValue(0);
+   * spotlight.byValue(0);
    */
   function byValue(value, options) {
     return checkCall('value', null, value, options);
@@ -460,16 +492,16 @@
    * Crawls environment objects executing `callback`, passing the current
    * `value`, `key`, and `object` as arguments, against each object encountered
    * and logs properties for which `callback` returns true.
-   * @memberOf find
+   * @memberOf spotlight
    * @param {Function} callback A function executed per object.
    * @param {Object} [options={}] The options object.
    * @example
    *
    * // filter by property names containing "oo"
-   * find.custom(function(value, key) { return key.indexOf('oo') > -1; });
+   * spotlight.custom(function(value, key) { return key.indexOf('oo') > -1; });
    *
    * // or filter by falsey values
-   * find.custom(function(value) { return !value; });
+   * spotlight.custom(function(value) { return !value; });
    */
   function custom(callback, options) {
     return checkCall('custom', 'function', callback, options);
@@ -481,11 +513,11 @@
    * The primary namespace.
    * @type Object
    */
-  var find = {
+  var spotlight = {
 
     /**
      * A flag to indicate that methods will execute in debug mode.
-     * @memberOf find
+     * @memberOf spotlight
      * @type Boolean
      */
     'debug': false,
@@ -520,20 +552,20 @@
 
   /*--------------------------------------------------------------------------*/
 
-  // expose find
+  // expose spotlight
   // in Narwhal, Node.js or Ringo
   if (freeExports) {
-    forIn(find, function(value, key) { freeExports[key] = value; });
-    find = freeExports;
+    forIn(spotlight, function(value, key) { freeExports[key] = value; });
+    spotlight = freeExports;
   }
   // via curl.js or RequireJS
   else if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
-    define(function() { return find; });
+    define(function() { return spotlight; });
   }
   // in a browser or Rhino
   else {
-    // use square bracket notation so Closure Compiler won't munge `find`
+    // use square bracket notation so Closure Compiler won't munge `spotlight`
     // http://code.google.com/closure/compiler/docs/api-tutorial3.html#export
-    window['find'] = find;
+    window['spotlight'] = spotlight;
   }
 }(this));

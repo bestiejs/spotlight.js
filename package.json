@@ -1,8 +1,8 @@
 {
-  "name": "waldo",
+  "name": "spotlight",
   "version": "0.1.337",
   "description": "An object crawler/property search library that works on nearly all JavaScript platforms.",
-  "homepage": "https://github.com/bestiejs/waldo",
+  "homepage": "https://github.com/bestiejs/spotlight.js",
   "main": "find",
   "keywords": [
     "crawl",
@@ -34,11 +34,11 @@
     }
   ],
   "bugs": {
-    "url": "https://github.com/bestiejs/waldo/issues"
+    "url": "https://github.com/bestiejs/spotlight.js/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/bestiejs/waldo.git"
+    "url": "https://github.com/bestiejs/spotlight.js.git"
   },
   "engines": [
     "node",

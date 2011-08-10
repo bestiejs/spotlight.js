@@ -1,17 +1,17 @@
-# Waldo API documentation
+# Spotlight.js API documentation
 
 <!-- div -->
 
 
 <!-- div -->
 
-## `find`
-* [`find`](#find)
-* [`find.debug`](#find.debug)
-* [`find.byKind`](#find.byKind)
-* [`find.byName`](#find.byName)
-* [`find.byValue`](#find.byValue)
-* [`find.custom`](#find.custom)
+## `spotlight`
+* [`spotlight`](#spotlight)
+* [`spotlight.debug`](#spotlight.debug)
+* [`spotlight.byKind`](#spotlight.byKind)
+* [`spotlight.byName`](#spotlight.byName)
+* [`spotlight.byValue`](#spotlight.byValue)
+* [`spotlight.custom`](#spotlight.custom)
 
 <!-- /div -->
 
@@ -24,11 +24,11 @@
 
 <!-- div -->
 
-## `find`
+## `spotlight`
 
 <!-- div -->
 
-### <a id="find" href="https://github.com/bestiejs/waldo.js/blob/master/waldo.js#L484" title="View in source">`find`</a>
+### <a id="spotlight" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L516" title="View in source">`spotlight`</a>
 *(Object)*: The primary namespace.
 [&#9650;][1]
 
@@ -37,7 +37,7 @@
 
 <!-- div -->
 
-### <a id="find.debug" href="https://github.com/bestiejs/waldo.js/blob/master/waldo.js#L491" title="View in source">`find.debug`</a>
+### <a id="spotlight.debug" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L523" title="View in source">`spotlight.debug`</a>
 *(Boolean)*: A flag to indicate that methods will execute in debug mode.
 [&#9650;][1]
 
@@ -46,7 +46,7 @@
 
 <!-- div -->
 
-### <a id="find.byKind" href="https://github.com/bestiejs/waldo.js/blob/master/waldo.js#L416" title="View in source">`find.byKind(kind [, options={}])`</a>
+### <a id="spotlight.byKind" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L448" title="View in source">`spotlight.byKind(kind [, options={}])`</a>
 Crawls environment objects logging all object properties whose values
 [&#9650;][1]
 
@@ -57,16 +57,16 @@ Crawls environment objects logging all object properties whose values
 #### Example
 ~~~ js
 // by constructor
-find.byKind(jQuery);
+spotlight.byKind(jQuery);
 
 // or by [[Class]]
-find.byKind('RegExp');
+spotlight.byKind('RegExp');
 
 // or by type
-find.byKind('undefined');
+spotlight.byKind('undefined');
 
 // or special kind "constructor"
-find.byKind('constructor');
+spotlight.byKind('constructor');
 ~~~
 
 <!-- /div -->
@@ -74,7 +74,7 @@ find.byKind('constructor');
 
 <!-- div -->
 
-### <a id="find.byName" href="https://github.com/bestiejs/waldo.js/blob/master/waldo.js#L437" title="View in source">`find.byName(name [, options={}])`</a>
+### <a id="spotlight.byName" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L469" title="View in source">`spotlight.byName(name [, options={}])`</a>
 Crawls environment objects logging all object properties of the specified name.
 [&#9650;][1]
 
@@ -86,13 +86,13 @@ Crawls environment objects logging all object properties of the specified name.
 ~~~ js
 // basic
 // > window.length -> (number) 0
-find.byName('length');
+spotlight.byName('length');
 
 // or with options
 // (finds all "map" properties on jQuery)
 // > $.map -> (function) function(a,b,c){...}
 // > $.fn.map -> (function) function(a){...}
-find.byName('map', { 'object': jQuery, 'path': '$' });
+spotlight.byName('map', { 'object': jQuery, 'path': '$' });
 ~~~
 
 <!-- /div -->
@@ -100,7 +100,7 @@ find.byName('map', { 'object': jQuery, 'path': '$' });
 
 <!-- div -->
 
-### <a id="find.byValue" href="https://github.com/bestiejs/waldo.js/blob/master/waldo.js#L455" title="View in source">`find.byValue(value [, options={}])`</a>
+### <a id="spotlight.byValue" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L487" title="View in source">`spotlight.byValue(value [, options={}])`</a>
 Crawls environment objects logging all object properties whose values are
 [&#9650;][1]
 
@@ -114,7 +114,7 @@ Crawls environment objects logging all object properties whose values are
 // > window.pageXOffset -> (number) 0
 // > window.screenX -> (number) 0
 // > window.length -> (number) 0
-find.byValue(0);
+spotlight.byValue(0);
 ~~~
 
 <!-- /div -->
@@ -122,7 +122,7 @@ find.byValue(0);
 
 <!-- div -->
 
-### <a id="find.custom" href="https://github.com/bestiejs/waldo.js/blob/master/waldo.js#L474" title="View in source">`find.custom(callback [, options={}])`</a>
+### <a id="spotlight.custom" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L506" title="View in source">`spotlight.custom(callback [, options={}])`</a>
 Crawls environment objects executing `callback`, passing the current
 [&#9650;][1]
 
@@ -133,10 +133,10 @@ Crawls environment objects executing `callback`, passing the current
 #### Example
 ~~~ js
 // filter by property names containing "oo"
-find.custom(function(value, key) { return key.indexOf('oo') > -1; });
+spotlight.custom(function(value, key) { return key.indexOf('oo') > -1; });
 
 // or filter by falsey values
-find.custom(function(value) { return !value; });
+spotlight.custom(function(value) { return !value; });
 ~~~
 
 <!-- /div -->
