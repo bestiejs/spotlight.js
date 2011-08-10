@@ -3,7 +3,7 @@
   "version": "0.1.337",
   "description": "An object crawler/property search library that works on nearly all JavaScript platforms.",
   "homepage": "https://github.com/bestiejs/spotlight.js",
-  "main": "find",
+  "main": "spotlight",
   "keywords": [
     "crawl",
     "find",
