@@ -157,9 +157,7 @@
    * @returns {String} Returns the value's [[Class]] or "Null" or "Undefined".
    */
   function getKindOf(value) {
-    var proto,
-        result;
-
+    var result;
     if (value == null) {
       result = value === null ? 'Null' : 'Undefined';
     }
@@ -167,9 +165,9 @@
       result = 'Global';
     }
     else if (isFunction(value) && isHostType(value, 'prototype')) {
+      // a function is assumed of kind "Constructor" if it has its own
+      // enumerable prototype properties or doesn't have a [[Class]] of Object
       if (toString.call(value.prototype) == '[object Object]') {
-        // a function is assumed of kind "Constructor" if it has its own enumerable
-        // prototype properties or is not an Object object
         forIn(value.prototype, function() { return !(result = 'Constructor'); }, value);
       } else {
         result = 'Constructor';
