@@ -1,8 +1,9 @@
 /*!
- * Waldo <http://github.com/angus-c/waldo/>, <http://github.com/bestiejs/waldo/>
+ * Spotlight.js <http://github.com/bestiejs/spotlight.js/>
+ * Copyright 2011 John-David Dalton <http://allyoucanleet.com/>
+ * Based on Waldo <http://github.com/angus-c/waldo/>,
  * Copyright 2011 Angus Croll <http://javascriptweblog.wordpress.com/>
- * And John-David Dalton <http://allyoucanleet.com/>
- * Available under MIT license <http://mths.be/mit>
+ * Both available under MIT license <http://mths.be/mit>
  */
 ;(function(window, undefined) {
 
