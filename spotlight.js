@@ -30,7 +30,7 @@
     },
     'kind': function(value, key, object) {
       var kind = [value, value = object[key]][0];
-      return isFunction(kind) ? value === Object(value) && value instanceof kind :
+      return isFunction(kind) ? value instanceof kind :
         typeof value == kind || getKindOf(value).toLowerCase() == kind.toLowerCase();
     },
     'name': function(value, key, object) {
@@ -248,7 +248,7 @@
   }
 
   /**
-   * Checks if the specified `value` is an object.
+   * Checks if the specified `value` is an Object object.
    * @private
    * @param {Mixed} value The value to check.
    * @returns {Boolean} Returns `true` if `value` is an object, else `false`.
@@ -277,7 +277,7 @@
    * @returns {Array|Null} If in debug mode return the value of the invoked function or `null` if errored.
    */
   function checkCall(name, expected, value, options) {
-    var result = (!expected || RegExp('^(?:' + expected + ')$').test(typeof value))
+    var result = (!expected || RegExp('^(?:' + expected + ')$', 'i').test(getKindOf(value)))
       ? crawl(name, value, options)
       : (log('error', '`' + value + '` must be a ' + expected.split('|').join(' or ')), null);
 
