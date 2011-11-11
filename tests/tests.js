@@ -19,6 +19,13 @@
     typeof global == 'object' && global ? 'global' :
     typeof environment == 'object' ? '<global object>' : 'window';
 
+  /** Adds Safari 2 support */
+  QUnit.hasOwnProperty || (Qunit.hasOwnProperty = function(property) {
+    return hasKey(this, property);
+  });
+
+  /*--------------------------------------------------------------------------*/
+
   /**
    * Simplifies the debug return values of `spotlight` methods by filtering non-log messages.
    * @private
