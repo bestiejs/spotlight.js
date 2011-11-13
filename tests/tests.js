@@ -19,11 +19,6 @@
     typeof global == 'object' && global ? 'global' :
     typeof environment == 'object' ? '<global object>' : 'window';
 
-  /** Adds Safari 2 support */
-  QUnit.hasOwnProperty || (Qunit.hasOwnProperty = function(property) {
-    return hasKey(this, property);
-  });
-
   /*--------------------------------------------------------------------------*/
 
   /**
@@ -220,11 +215,13 @@
 
   /*--------------------------------------------------------------------------*/
 
-  if (window.document && window.require) {
-    test('require("spotlight")', function() {
+  test('require("spotlight")', function() {
+    if (window.document && window.require) {
       strictEqual((spotlight2 || {}).debug, false, 'require("spotlight")');
-    });
-  }
+    } else {
+      ok(true, 'test skipped');
+    }
+  });
 
   /*--------------------------------------------------------------------------*/
 
