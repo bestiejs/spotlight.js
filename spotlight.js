@@ -559,7 +559,7 @@
   }
   // via curl.js or RequireJS
   else if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
-    define(function() { return spotlight; });
+    define('spotlight', spotlight);
   }
   // in a browser or Rhino
   else {
