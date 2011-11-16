@@ -41,7 +41,12 @@ load('spotlight.js');
 In [RequireJS](http://requirejs.org/):
 
 ~~~ js
-require(['path/to/spotlight'], function(spotlight) {
+require({
+  'paths': {
+    'spotlight': 'path/to/spotlight'
+  }
+},
+['spotlight'], function(spotlight) {
   spotlight.byKind('constructor');
 });
 ~~~

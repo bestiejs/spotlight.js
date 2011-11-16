@@ -42,9 +42,11 @@
 			require({
 				'baseUrl': '../vendor/requirejs/',
 				'urlArgs': 't=' + (+new Date),
-				'paths': { 'src': '../../' }
+				'paths': {
+					'spotlight': '../../spotlight'
+				}
 			},
-			['src/spotlight'], function(spotlight) {
+			['spotlight'], function(spotlight) {
 				spotlight2 = spotlight;
 				require(['tests.js']);
 			});
