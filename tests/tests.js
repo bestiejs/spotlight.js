@@ -5,19 +5,24 @@
 
   /** The unit testing framework */
   var QUnit =
-    window.QUnit ||
-    (window.QUnit = load('../vendor/qunit/qunit/qunit.js') || window.QUnit) &&
-    (load('../vendor/qunit-clib/qunit-clib.js'), window.QUnit);
+    window.QUnit || (
+      window.setTimeout || (window.addEventListener = window.setTimeout = / /),
+      window.QUnit = load('../vendor/qunit/qunit/qunit.js') || window.QUnit,
+      load('../vendor/qunit-clib/qunit-clib.js'),
+      window.addEventListener.test && delete window.addEventListener,
+      window.QUnit
+    );
 
   /** The `spotlight` object to test */
   var spotlight =
     window.spotlight ||
-    (load('../spotlight.js') || window.spotlight);
+    load('../spotlight.js') ||
+    window.spotlight;
 
   /** The root name for the environment */
   var rootName =
     typeof global == 'object' && global ? 'global' :
-    typeof environment == 'object' ? '<global object>' : 'window';
+      typeof environment == 'object' ? '<global object>' : 'window';
 
   /*--------------------------------------------------------------------------*/
 
