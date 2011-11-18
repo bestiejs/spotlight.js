@@ -41,11 +41,11 @@
     }
   },
 
-  /** A flag to indicate that we should skip the `system.stdin` property */
-  skipStdin = !!(function() {
+  /** Used to overwrite iterators so they don't interfere with for..in loops */
+  defaultIterator = (function() {
     try {
-      // skip `system.stdin` in RingoJS v0.8.0 because it hangs when iterating over it
-      return freeExports && freeGlobal && require('ringo/engine').version.join('.') == '0.8';
+      // https://developer.mozilla.org/en/new_in_javascript_1.7#Iterators
+      return Iterator(0).__iterator__;
     } catch(e) { }
   }());
 
@@ -265,7 +265,7 @@
     // some properties throw errors when accessed
     try {
       var constructor = value && value.constructor;
-    } catch(e) {}
+    } catch(e) { }
     // IE < 9 presents nodes like Object objects:
     // IE < 8 are missing the node's constructor property
     // IE 8 node constructors are typeof "object"
@@ -305,6 +305,7 @@
     options || (options = {});
 
     var data,
+        iterator,
         owner,
         pool,
         pooled,
@@ -335,12 +336,17 @@
       while ((data = queue.pop())) {
         object = data.object;
         path = data.path;
+        iterator = object.__iterator__;
         separator = path ? '.' : '';
 
+        // avoid problems with iterators
+        // https://github.com/ringo/ringojs/issues/157
+        if (defaultIterator && iterator) {
+          object.__iterator__ = defaultIterator;
+        }
         forOwn(object, function(value, key) {
-          if (key == 'system') return;
           // inspect objects
-          if (isObject(value) && !(skipStdin && key == 'stdin')) {
+          if (isObject(value)) {
             // clone current pool per prop on the current `object` to avoid siblings
             // polluting each others object pools
             pool = data.pool.slice();
@@ -373,6 +379,9 @@
         // be a function prototype then supply a dummy function to trigger
         // `forOwn()`'s `skipCtor` flag.
         data.pool.length == 1 && owner);
+
+        // restore iterator
+        iterator && (object.__iterator__ = iterator);
       }
     }
     return result;
