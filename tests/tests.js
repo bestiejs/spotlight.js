@@ -9,7 +9,7 @@
       window.setTimeout || (window.addEventListener = window.setTimeout = / /),
       window.QUnit = load('../vendor/qunit/qunit/qunit.js') || window.QUnit,
       load('../vendor/qunit-clib/qunit-clib.js'),
-      window.addEventListener.test && delete window.addEventListener,
+      (window.addEventListener || 0).test && delete window.addEventListener,
       window.QUnit
     );
 

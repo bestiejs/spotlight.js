@@ -39,7 +39,15 @@
     'value': function(value, key, object) {
       return object[key] === value;
     }
-  };
+  },
+
+  /** A flag to indicate that we should skip the `system.stdin` property */
+  skipStdin = !!(function() {
+    try {
+      // skip `system.stdin` in RingoJS v0.8.0 because it hangs when iterating over it
+      return freeExports && freeGlobal && require('ringo/engine').version.join('.') == '0.8';
+    } catch(e) { }
+  }());
 
   /*--------------------------------------------------------------------------*/
 
@@ -65,7 +73,7 @@
    * @param {Function} callback A function executed per own property.
    * @param {Mixed} [owner=null] The owner of the `object`.
    */
-  function forIn() {
+  function forOwn() {
     // list of possible shadowed properties of Object.prototype
     var shadowed = [
       'constructor', 'hasOwnProperty', 'isPrototypeOf',
@@ -89,7 +97,7 @@
       };
 
     // IE < 9 skips shadowed properties
-    var forInShadowed = flag == 0 &&
+    var forOwnShadowed = flag == 0 &&
       function(object, callback, owner) {
         // because IE < 9 can't set the [[Enumerable]] attribute of an existing
         // property and the `constructor` property of a prototype defaults to
@@ -106,7 +114,7 @@
       };
 
     // lazy define
-    forIn = function(object, callback, owner) {
+    forOwn = function(object, callback, owner) {
       var done,
           seen = {},
           skipProto = isFunction(object);
@@ -142,11 +150,11 @@
           break;
         }
       }
-      if (!done && forInShadowed) {
-        forInShadowed(object, callback, owner);
+      if (!done && forOwnShadowed) {
+        forOwnShadowed(object, callback, owner);
       }
     };
-    forIn.apply(null, arguments);
+    forOwn.apply(null, arguments);
   }
 
   /**
@@ -169,7 +177,7 @@
       // a function is assumed of kind "Constructor" if it has its own
       // enumerable prototype properties or doesn't have a [[Class]] of Object
       if (toString.call(value.prototype) == '[object Object]') {
-        forIn(value.prototype, function() { return !(result = 'Constructor'); }, value);
+        forOwn(value.prototype, function() { return !(result = 'Constructor'); }, value);
       } else {
         result = 'Constructor';
       }
@@ -329,9 +337,10 @@
         path = data.path;
         separator = path ? '.' : '';
 
-        forIn(object, function(value, key) {
+        forOwn(object, function(value, key) {
+          if (key == 'system') return;
           // inspect objects
-          if (isObject(value)) {
+          if (isObject(value) && !(skipStdin && key == 'stdin')) {
             // clone current pool per prop on the current `object` to avoid siblings
             // polluting each others object pools
             pool = data.pool.slice();
@@ -357,12 +366,12 @@
               ]);
               log('text', result[result.length - 1][0], value);
             }
-          } catch(e) {}
+          } catch(e) { }
         },
-        // attempt to handle an edge cause where a function prototype is provided
-        // via `options.object` by guesstimating, based on it's `options.path` to
+        // attempt to handle an edge case where a function prototype is provided
+        // via `options.object` by guesstimating, based on its `options.path` to
         // be a function prototype then supply a dummy function to trigger
-        // `forIn()`'s `skipCtor` flag.
+        // `forOwn()`'s `skipCtor` flag.
         data.pool.length == 1 && owner);
       }
     }
@@ -554,7 +563,7 @@
   // expose spotlight
   // in Narwhal, Node.js or Ringo
   if (freeExports) {
-    forIn(spotlight, function(value, key) { freeExports[key] = value; });
+    forOwn(spotlight, function(value, key) { freeExports[key] = value; });
     spotlight = freeExports;
   }
   // via curl.js or RequireJS
