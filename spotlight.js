@@ -41,11 +41,17 @@
     }
   },
 
-  /** Used to overwrite iterators so they don't interfere with for..in loops */
+  /**
+   * Used to overwrite iterators so they don't interfere with for..in loops
+   * https://developer.mozilla.org/en/new_in_javascript_1.7#Iterators
+   */
   defaultIterator = (function() {
     try {
-      // https://developer.mozilla.org/en/new_in_javascript_1.7#Iterators
-      return Iterator(0).__iterator__;
+      var o = Iterator({ 'x': 1 }),
+          fn = o.__iterator__;
+
+      for (o in o) { }
+      return toString.call(o) == '[object Array]' && isFunction(fn) && fn;
     } catch(e) { }
   }());
 
@@ -96,7 +102,7 @@
         return hasKey(seen, key) || !(seen[key] = true);
       };
 
-    // IE < 9 skips shadowed properties
+    // IE < 9 skips enumerable properties shadowing non-enumerable ones
     var forOwnShadowed = flag == 0 &&
       function(object, callback, owner) {
         // because IE < 9 can't set the [[Enumerable]] attribute of an existing
@@ -334,16 +340,26 @@
       // a non-recursive solution to avoid call stack limits
       // http://www.jslab.dk/articles/non.recursive.preorder.traversal.part4
       while ((data = queue.pop())) {
+        iterator = false;
         object = data.object;
         path = data.path;
-        iterator = object.__iterator__;
         separator = path ? '.' : '';
 
         // avoid problems with iterators
         // https://github.com/ringo/ringojs/issues/157
-        if (defaultIterator && iterator) {
-          object.__iterator__ = defaultIterator;
+        try {
+          if (iterator = (iterator = object.__iterator__) && defaultIterator && isFunction(iterator)) {
+            try {
+              object.__iterator__ = defaultIterator;
+            } catch(e) { }
+            if (iterator != defaultIterator) {
+              continue;
+            }
+          }
+        } catch(e) {
+          continue;
         }
+
         forOwn(object, function(value, key) {
           // inspect objects
           if (isObject(value)) {
