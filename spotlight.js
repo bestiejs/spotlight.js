@@ -437,7 +437,7 @@
       }
     };
 
-    // for Narwhal, Rhino or Ringo
+    // for Narwhal, Rhino or RingoJS
     if (!console && !document && isFunction(window.print)) {
       console = { 'log': print };
     }
@@ -567,7 +567,7 @@
   /*--------------------------------------------------------------------------*/
 
   // mod `defaultRoots` for server-side environments
-  // for Narwhal, Node.js or Ringo
+  // for Narwhal, Node.js, or RingoJS
   if (freeGlobal && freeExports) {
     defaultRoots = [
       { 'object': freeExports, 'path': 'exports' },
@@ -575,16 +575,19 @@
     ];
   }
   // for Rhino
-  else if (typeof environment == 'object' && getKindOf(environment) == 'Environment') {
+  else if (getKindOf(window.environment) == 'Environment') {
     defaultRoots[0].path = '<global object>';
   }
 
   /*--------------------------------------------------------------------------*/
 
   // expose spotlight
-  // in Narwhal, Node.js or Ringo
+  // in Narwhal, Node.js, or RingoJS
   if (freeExports) {
-    forOwn(spotlight, function(value, key) { freeExports[key] = value; });
+    forOwn(spotlight, function(value, key) {
+      freeExports[key] = value;
+    });
+    // assign `exports` to `spotlight` so we can detect changes to the `debug` flag
     spotlight = freeExports;
   }
   // via curl.js or RequireJS
