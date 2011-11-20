@@ -33,7 +33,7 @@
    * @returns {Array} The filtered result.
    */
   function simplify(result) {
-    result = result.slice();
+    result = [].slice.call(result);
     for (var i = -1, l = result.length; ++i < l; ) {
       result[i] = result[i][0];
     }
@@ -63,6 +63,29 @@
     result = simplify(spotlight.byName('a', { 'object': a.a }));
     expected = ['<object>.a -> (object)'];
     deepEqual(result, expected, 'no path');
+  });
+
+  /*--------------------------------------------------------------------------*/
+
+  test('custom __iterator__', function() {
+    var hasIterators = (function() {
+      try {
+        var o = Iterator({ 'x': 1 }),
+            toString = o.toString;
+        for (o in o) { }
+        return toString.call(o) == '[object Array]';
+      } catch(e) { }
+    }());
+
+    window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
+    a.b.next = a.b.__iterator__ = function() { };
+
+    if (hasIterators) {
+      var result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
+      deepEqual(result, ['a.b.y -> (number)'], 'custom __iterator__');
+    } else {
+      ok(true, 'test skipped');
+    }
   });
 
   /*--------------------------------------------------------------------------*/

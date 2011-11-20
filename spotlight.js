@@ -45,13 +45,11 @@
    * Used to overwrite iterators so they don't interfere with for..in loops
    * https://developer.mozilla.org/en/new_in_javascript_1.7#Iterators
    */
-  defaultIterator = (function() {
+  hasIterators = (function() {
     try {
-      var o = Iterator({ 'x': 1 }),
-          fn = o.__iterator__;
-
+      var o = Iterator({ 'x': 1 });
       for (o in o) { }
-      return toString.call(o) == '[object Array]' && isFunction(fn) && fn;
+      return toString.call(o) == '[object Array]';
     } catch(e) { }
   }());
 
@@ -122,27 +120,45 @@
     // lazy define
     forOwn = function(object, callback, owner) {
       var done,
+          iterator,
+          key,
+          value,
           seen = {},
           skipProto = isFunction(object);
 
-      // some objects like Firefox 3's `XPCSafeJSObjectWrapper.prototype` may
-      // throw errors when attempting to iterate over them
       object = Object(object);
+
       try {
-        for (var key in object) {
-          break;
+        // avoid problems with iterators
+        // https://github.com/ringo/ringojs/issues/157
+        if ((iterator = hasIterators && isFunction(object.__iterator__))) {
+          object = new Iterator(object);
+        }
+        // some objects like Firefox 3's `XPCSafeJSObjectWrapper.prototype` may
+        // throw errors when attempting to iterate over them
+        else {
+          for (key in object) {
+            break;
+          }
         }
       } catch(e) {
         return;
       }
 
-      for (var key in object) {
-        // some properties like Firefox's `console.constructor` or IE's
-        // `element.offsetParent` may throw errors when accessed
-        try {
-          toString.call(object[key]);
-        } catch(e) {
-          continue;
+      for (key in object) {
+        // iterators will assign an array to `key`
+        if (iterator) {
+          value = key[1];
+          key = key[0];
+        }
+        else {
+          // some properties like Firefox's `console.constructor` or IE's
+          // `element.offsetParent` may throw errors when accessed
+          try {
+            value = object[key];
+          } catch(e) {
+            continue;
+          }
         }
         // Opera and Safari incorrectly set a function's `prototype` property
         // [[Enumerable]] value to true by default. Because of this we standardize
@@ -150,9 +166,9 @@
         // their [[Enumerable]] value.
         if (done =
             !(hasSeen && hasSeen(seen, key)) &&
-            hasKey(object, key) &&
+            (iterator || hasKey(object, key)) &&
             !(skipProto && key == 'prototype') &&
-            callback(object[key], key, object) === false) {
+            callback(value, key, object) === false) {
           break;
         }
       }
@@ -276,7 +292,7 @@
     // IE < 8 are missing the node's constructor property
     // IE 8 node constructors are typeof "object"
     return constructor && typeof constructor != 'object' &&
-      getKindOf(value) == 'Object';
+      toString.call(value) == '[object Object]';
   }
 
   /*--------------------------------------------------------------------------*/
@@ -311,7 +327,6 @@
     options || (options = {});
 
     var data,
-        iterator,
         owner,
         pool,
         pooled,
@@ -340,25 +355,9 @@
       // a non-recursive solution to avoid call stack limits
       // http://www.jslab.dk/articles/non.recursive.preorder.traversal.part4
       while ((data = queue.pop())) {
-        iterator = false;
         object = data.object;
         path = data.path;
         separator = path ? '.' : '';
-
-        // avoid problems with iterators
-        // https://github.com/ringo/ringojs/issues/157
-        try {
-          if (iterator = (iterator = object.__iterator__) && defaultIterator && isFunction(iterator)) {
-            try {
-              object.__iterator__ = defaultIterator;
-            } catch(e) { }
-            if (iterator != defaultIterator) {
-              continue;
-            }
-          }
-        } catch(e) {
-          continue;
-        }
 
         forOwn(object, function(value, key) {
           // inspect objects
@@ -395,9 +394,6 @@
         // be a function prototype then supply a dummy function to trigger
         // `forOwn()`'s `skipCtor` flag.
         data.pool.length == 1 && owner);
-
-        // restore iterator
-        iterator && (object.__iterator__ = iterator);
       }
     }
     return result;
