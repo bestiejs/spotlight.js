@@ -285,15 +285,22 @@
    * @returns {Boolean} Returns `true` if `value` is an object, else `false`.
    */
   function isObject(value) {
-    // some properties throw errors when accessed
-    try {
-      var constructor = value && value.constructor;
-    } catch(e) { }
-    // IE < 9 presents nodes like Object objects:
-    // IE < 8 are missing the node's constructor property
-    // IE 8 node constructors are typeof "object"
-    return constructor && typeof constructor != 'object' &&
-      toString.call(value) == '[object Object]';
+    var constructor,
+        result = toString.call(value) == '[object Object]';
+
+    // some objects like `window.java` may kill script execution when checking
+    // for their constructor, so we filter by [[Class]] first
+    if (result) {
+      // some properties throw errors when accessed
+      try {
+        constructor = value && value.constructor;
+      } catch(e) { }
+      // IE < 9 presents nodes like Object objects:
+      // IE < 8 are missing the node's constructor property
+      // IE 8 node constructors are typeof "object"
+      result = constructor && typeof constructor != 'object';
+    }
+    return result;
   }
 
   /*--------------------------------------------------------------------------*/

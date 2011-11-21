@@ -196,11 +196,19 @@
     var now = String(+new Date);
     window.a = { 'b': { 'c': +now } };
 
-    var result = simplify(spotlight.custom(function(value) { return value == now }));
+    var result = simplify(spotlight.custom(function(value, key) {
+      // avoid problems with `window.java` and `window.netscape` objects
+      // potentially killing script execution when their values are coerced
+      return typeof value == 'number' && value == now;
+    }));
+
     var expected = [rootName + '.a.b.c -> (number)'];
     deepEqual(result, expected, 'basic');
 
-    spotlight.custom(function() { result = [].slice.call(arguments); }, { 'object': a.b });
+    spotlight.custom(function() {
+      result = [].slice.call(arguments);
+    }, { 'object': a.b });
+
     expected = [a.b.c, 'c', a.b];
     deepEqual(result, expected, 'callback arguments');
 

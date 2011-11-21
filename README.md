@@ -1,6 +1,6 @@
 # Spotlight.js
 
-An [object crawler/property search](http://javascriptweblog.wordpress.com/2011/07/11/waldo-search-the-javascript-runtime-in-under-1-kb/) library that works on nearly all JavaScript platforms<sup><a name="fnref1" href="#fn1">1</a></sup>.
+An object crawler/property search library that works on nearly all JavaScript platforms<sup><a name="fnref1" href="#fn1">1</a></sup>.
 
 ## BestieJS
 
@@ -109,9 +109,7 @@ Feel free to fork if you see possible improvements!
   1. Spotlight.js has been tested in at least Chrome 5/8/12/14, Firefox 1.5-4, IE 6-10, Opera 9.25-12, Safari 2-5, Node.js 0.4.2, Narwhal 0.3.2, Ringo 0.7, and Rhino 1.7RC3.
      <a name="fn1" title="Jump back to footnote 1 in the text." href="#fnref1">&#8617;</a>
 
-## Authors
+## Author
 
-* [Angus Croll](http://javascriptweblog.wordpress.com/)
-  [![twitter/angustweets](http://gravatar.com/avatar/52c6174ba60557536f93809b4e95d97c?s=70)](https://twitter.com/angustweets "Follow @angustweets on Twitter")
 * [John-David Dalton](http://allyoucanleet.com/)
   [![twitter/jdalton](http://gravatar.com/avatar/299a3d891ff1920b69c364d061007043?s=70)](https://twitter.com/jdalton "Follow @jdalton on Twitter")
