@@ -132,8 +132,10 @@
       try {
         // avoid problems with iterators
         // https://github.com/ringo/ringojs/issues/157
-        if ((iterator = hasIterators && isFunction(object.__iterator__))) {
-          object = new Iterator(object);
+        if (hasIterators && isFunction(object.__iterator__)) {
+          iterator = object.__iterator__;
+          delete object.__iterator__;
+          object = [new Iterator(object), object.__iterator__ = iterator][0];
         }
         // some objects like Firefox 3's `XPCSafeJSObjectWrapper.prototype` may
         // throw errors when attempting to iterate over them
