@@ -83,7 +83,41 @@
     if (hasIterators) {
       var result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
       deepEqual(result, ['a.b.y -> (number)'], 'custom __iterator__');
+
+      if (Object.defineProperty) {
+        window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
+        Object.defineProperty(a.b, '__iterator__', {
+          'enumerable': true,
+          'writable': true,
+          'value': function() { }
+        });
+
+        result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
+        deepEqual(result, ['a.b.y -> (number)'], 'non-configurable __iterator__');
+
+        window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
+        Object.defineProperty(a.b, '__iterator__', {
+          'configurable': true,
+          'enumerable': true,
+          'value': function() { }
+        });
+
+        result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
+        deepEqual(result, ['a.b.y -> (number)'], 'non-writable __iterator__');
+
+        window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
+        Object.defineProperty(a.b, '__iterator__', {
+          'enumerable': true,
+          'value': function() { }
+        });
+
+        result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
+        deepEqual(result, [], 'non-configurable and non-writable __iterator__');
+      }
     } else {
+      ok(true, 'test skipped');
+      ok(true, 'test skipped');
+      ok(true, 'test skipped');
       ok(true, 'test skipped');
     }
   });

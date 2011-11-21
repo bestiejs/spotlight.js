@@ -134,7 +134,11 @@
         // https://github.com/ringo/ringojs/issues/157
         if (hasIterators && isFunction(object.__iterator__)) {
           iterator = object.__iterator__;
+          object.__iterator__ = null;
           delete object.__iterator__;
+          if (object.__iterator__) {
+            throw 1;
+          }
           object = [new Iterator(object), object.__iterator__ = iterator][0];
         }
         // some objects like Firefox 3's `XPCSafeJSObjectWrapper.prototype` may

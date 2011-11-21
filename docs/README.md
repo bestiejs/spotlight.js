@@ -28,7 +28,7 @@
 
 <!-- div -->
 
-### <a id="spotlight" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L562" title="View in source">`spotlight`</a>
+### <a id="spotlight" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L566" title="View in source">`spotlight`</a>
 *(Object)*: The primary namespace.
 [&#9650;][1]
 
@@ -37,7 +37,7 @@
 
 <!-- div -->
 
-### <a id="spotlight.debug" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L569" title="View in source">`spotlight.debug`</a>
+### <a id="spotlight.debug" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L573" title="View in source">`spotlight.debug`</a>
 *(Boolean)*: A flag to indicate that methods will execute in debug mode.
 [&#9650;][1]
 
@@ -46,7 +46,7 @@
 
 <!-- div -->
 
-### <a id="spotlight.byKind" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L494" title="View in source">`spotlight.byKind(kind [, options={}])`</a>
+### <a id="spotlight.byKind" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L498" title="View in source">`spotlight.byKind(kind [, options={}])`</a>
 Crawls environment objects logging all object properties whose values are of a specified constructor instance, [[Class]], or type.
 [&#9650;][1]
 
@@ -74,7 +74,7 @@ spotlight.byKind('constructor');
 
 <!-- div -->
 
-### <a id="spotlight.byName" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L515" title="View in source">`spotlight.byName(name [, options={}])`</a>
+### <a id="spotlight.byName" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L519" title="View in source">`spotlight.byName(name [, options={}])`</a>
 Crawls environment objects logging all object properties of the specified name.
 [&#9650;][1]
 
@@ -100,7 +100,7 @@ spotlight.byName('map', { 'object': jQuery, 'path': '$' });
 
 <!-- div -->
 
-### <a id="spotlight.byValue" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L533" title="View in source">`spotlight.byValue(value [, options={}])`</a>
+### <a id="spotlight.byValue" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L537" title="View in source">`spotlight.byValue(value [, options={}])`</a>
 Crawls environment objects logging all object properties whose values are a strict match for the specified value.
 [&#9650;][1]
 
@@ -122,7 +122,7 @@ spotlight.byValue(0);
 
 <!-- div -->
 
-### <a id="spotlight.custom" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L552" title="View in source">`spotlight.custom(callback [, options={}])`</a>
+### <a id="spotlight.custom" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L556" title="View in source">`spotlight.custom(callback [, options={}])`</a>
 Crawls environment objects executing `callback`, passing the current `value`, `key`, and `object` as arguments, against each object encountered and logs properties for which `callback` returns true.
 [&#9650;][1]
 
