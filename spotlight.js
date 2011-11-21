@@ -63,9 +63,10 @@
    * @returns {Mixed} The filtered value.
    */
   function filterOne(array, callback) {
-    for (var index = 0, length = array.length; index < length; index++) {
-      if (index in array && callback(array[index], index, array)) {
-        return array[index];
+    var length = array.length;
+    while (length--) {
+      if (callback(array[length])) {
+        return array[length];
       }
     }
   }
@@ -339,7 +340,12 @@
 
     // resolve undefined path
     if (path == null) {
-      path = (filterOne(roots, function(data) { return object == data.object; }) || { 'path': '<object>' }).path;
+      path = (
+        filterOne(roots, function(data) {
+          return object == data.object;
+        }) ||
+        { 'path': '<object>' }
+      ).path;
     }
     // resolve object roots
     if (options.object) {
@@ -368,7 +374,9 @@
 
             // check if already pooled (prevents circular references)
             // console.log('debug:', path, key, data.pool.length, data.pool.slice());
-            pooled = filterOne(pool, function(data) { return value == data.object; });
+            pooled = filterOne(pool, function(data) {
+              return value == data.object;
+            });
 
             // add to "call" queue
             if (!pooled) {
@@ -437,7 +445,7 @@
       }
     };
 
-    // for Narwhal, Rhino or RingoJS
+    // for Narwhal, Rhino, or RingoJS
     if (!console && !document && isFunction(window.print)) {
       console = { 'log': print };
     }
@@ -568,7 +576,7 @@
 
   // mod `defaultRoots` for server-side environments
   // for Narwhal, Node.js, or RingoJS
-  if (freeGlobal && freeExports) {
+  if (freeExports && freeGlobal) {
     defaultRoots = [
       { 'object': freeExports, 'path': 'exports' },
       { 'object': freeGlobal, 'path': 'global' }
