@@ -47,7 +47,7 @@
     }
   },
 
-  /** Used to flag environments/features */
+  /** Used to flag features */
   has = {
 
     /** Detect ES5+ property descriptor API */

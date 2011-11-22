@@ -1,6 +1,6 @@
 {
   "name": "spotlight",
-  "version": "0.1.337",
+  "version": "0.1.338",
   "description": "An object crawler/property search library that works on nearly all JavaScript platforms.",
   "homepage": "https://github.com/bestiejs/spotlight.js",
   "main": "spotlight",
@@ -21,18 +21,6 @@
     "email": "john@fusejs.com",
     "web": "http://allyoucanleet.com/"
   },
-  "maintainers": [
-    {
-      "name": "Angus Croll",
-      "email": "anguscroll@gmail.com",
-      "web": "http://javascriptweblog.wordpress.com/"
-    },
-    {
-      "name": "John-David Dalton",
-      "email": "john@fusejs.com",
-      "web": "http://allyoucanleet.com/"
-    }
-  ],
   "bugs": {
     "url": "https://github.com/bestiejs/spotlight.js/issues"
   },
