@@ -143,7 +143,7 @@
 
     var result = simplify(spotlight.byKind(Klass));
     var expected = [rootName + '.a.b.c -> (object)'];
-    deepEqual(result, expected, 'Klass instance');
+    deepEqual(result.slice(0, 1), expected, 'Klass instance');
 
     window.a = { 'b': { 'c': [] } };
 
@@ -185,13 +185,13 @@
 
     var result = simplify(spotlight.byName('c'));
     var expected = [rootName + '.a.b.c -> (number)'];
-    deepEqual(result, expected, 'basic');
+    deepEqual(result.slice(0, 1), expected, 'basic');
 
     window.a = { 'a': { 'a': { 'b': { 'c': 12 } } } };
 
     result = simplify(spotlight.byName('c'));
     expected = [rootName + '.a.a.a.b.c -> (number)'];
-    deepEqual(result, expected, 'repeated property names');
+    deepEqual(result.slice(0, 1), expected, 'repeated property names');
 
     window.a = { 'foo': { 'b': { 'foo': { 'c': { 'foo': 12 } } } } };
 
@@ -202,7 +202,7 @@
       rootName + '.a.foo.b.foo.c.foo -> (number)'
     ];
 
-    deepEqual(result, expected, 'multiple matches');
+    deepEqual(result.slice(0, 3), expected, 'multiple matches');
 
     window.a = { 'foo': { 'b': { 'foo': { 'c': { 'foo': null } } } } };
     a.foo.b.foo.c.foo = a;
@@ -215,7 +215,7 @@
       rootName + '.a.foo.b.foo.c.foo -> (<' + rootName + '.a>)'
     ];
 
-    deepEqual(result, expected, 'circular references');
+    deepEqual(result.slice(0, 3), expected, 'circular references');
 
     result = spotlight.byName(12);
     strictEqual(result, null, 'incorrect argument');
@@ -229,7 +229,7 @@
 
     var result = simplify(spotlight.byValue(value));
     var expected = [rootName + '.a.b.c -> (string)'];
-    deepEqual(result, expected, 'basic');
+    deepEqual(result.slice(0, 1), expected, 'basic');
 
     window.a = { 'b': { 'c': 12 } };
 
@@ -250,7 +250,7 @@
     }));
 
     var expected = [rootName + '.a.b.c -> (number)'];
-    deepEqual(result, expected, 'basic');
+    deepEqual(result.slice(0, 1), expected, 'basic');
 
     spotlight.custom(function() {
       result = [].slice.call(arguments);
@@ -293,7 +293,7 @@
 
     result = simplify(spotlight.byName('a', { 'object': window.window }));
     expected = [rootName + '.a -> (object)'];
-    deepEqual(result, expected, 'Opera < 10.53 window');
+    deepEqual(result.slice(0, 1), expected, 'Opera < 10.53 window');
   });
 
   /*--------------------------------------------------------------------------*/
