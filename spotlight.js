@@ -106,6 +106,7 @@
 
     // flag for..in bugs
     var flag = (function() {
+      // test must use a non-native constructor to catch the Safari 2 issue
       function Klass() { this.valueOf = 0; };
       var count = Klass.prototype.valueOf = 0;
       for (var key in new Klass) { count++; }
@@ -191,10 +192,10 @@
             continue;
           }
         }
-        // Opera and Safari incorrectly set a function's `prototype` property
-        // [[Enumerable]] value to true by default. Because of this we standardize
-        // on skipping the the `prototype` property of functions regardless of
-        // their [[Enumerable]] value.
+        // Opera < 12 and Safari < 5.1 (if the prototype or a property on the prototype has been set)
+        // incorrectly set a function's `prototype` property [[Enumerable]] value
+        // to true. Because of this we standardize on skipping the the `prototype`
+        // property of functions regardless of their [[Enumerable]] value.
         if (done =
             !(hasSeen && hasSeen(seen, key)) &&
             (iterator || hasKey(object, key)) &&
