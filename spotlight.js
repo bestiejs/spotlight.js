@@ -16,8 +16,14 @@
   /** Detect free variable `global` */
   freeGlobal = typeof global == 'object' && global && (global == global.global ? (window = global) : global),
 
+  /** Used to get __iterator__ descriptors */
+  getDescriptor = Object.getOwnPropertyDescriptor,
+
   /** Used in case an object doesn't have its own method */
   hasOwnProperty = {}.hasOwnProperty,
+
+  /** Used to set __iterator__ descriptors */
+  setDescriptor = Object.defineProperty,
 
   /** Used to resolve a value's internal [[Class]] */
   toString = {}.toString,
@@ -41,17 +47,29 @@
     }
   },
 
-  /**
-   * Used to overwrite iterators so they don't interfere with for..in loops
-   * https://developer.mozilla.org/en/new_in_javascript_1.7#Iterators
-   */
-  hasIterators = (function() {
-    try {
-      var o = Iterator({ 'x': 1 });
-      for (o in o) { }
-      return toString.call(o) == '[object Array]';
-    } catch(e) { }
-  }());
+  /** Used to flag environments/features */
+  has = {
+
+    /** Detect ES5+ property descriptor API */
+    'descriptors' : !!(function() {
+      try {
+        var o = {};
+        return (setDescriptor(o, o, o), 'value' in getDescriptor(o, o));
+      } catch(e) { }
+    }()),
+
+    /**
+     * Detect JavaScript 1.7 iterators
+     * https://developer.mozilla.org/en/new_in_javascript_1.7#Iterators
+     */
+    'iterators': !!(function() {
+      try {
+        var o = Iterator({ '': 1 });
+        for (o in o) { }
+        return toString.call(o) == '[object Array]';
+      } catch(e) { }
+    }())
+  };
 
   /*--------------------------------------------------------------------------*/
 
@@ -132,14 +150,20 @@
       try {
         // avoid problems with iterators
         // https://github.com/ringo/ringojs/issues/157
-        if (hasIterators && isFunction(object.__iterator__)) {
-          iterator = object.__iterator__;
+        if (has.iterators && isFunction(object.__iterator__)) {
+          iterator = has.descriptors
+            ? getDescriptor(object, '__iterator__')
+            : object.__iterator__;
+
           object.__iterator__ = null;
           delete object.__iterator__;
           if (object.__iterator__) {
             throw 1;
           }
-          object = [new Iterator(object), object.__iterator__ = iterator][0];
+          object = [new Iterator(object), has.descriptors
+            ? setDescriptor(object, '__iterator__', iterator)
+            : object.__iterator__ = iterator
+          ][0];
         }
         // some objects like Firefox 3's `XPCSafeJSObjectWrapper.prototype` may
         // throw errors when attempting to iterate over them

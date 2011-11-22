@@ -68,56 +68,69 @@
   /*--------------------------------------------------------------------------*/
 
   test('custom __iterator__', function() {
-    var hasIterators = (function() {
-      try {
-        var o = Iterator({ 'x': 1 }),
-            toString = o.toString;
-        for (o in o) { }
-        return toString.call(o) == '[object Array]';
-      } catch(e) { }
-    }());
+    var result,
+        skipped = 5,
+        noop = function() { },
+        getDescriptor = Object.getOwnPropertyDescriptor,
+        setDescriptor = Object.defineProperty;
 
-    window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
-    a.b.next = a.b.__iterator__ = function() { };
+    var has = {
 
-    if (hasIterators) {
-      var result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
+      'descriptors' : !!(function() {
+        try {
+          var o = {};
+          return (setDescriptor(o, o, o), 'value' in getDescriptor(o, o));
+        } catch(e) { }
+      }()),
+
+      'iterators': !!(function() {
+        try {
+          var o = Iterator({ '': 1 }),
+              toString = o.toString;
+          for (o in o) { }
+          return toString.call(o) == '[object Array]';
+        } catch(e) { }
+      }())
+    };
+
+    if (has.iterators) {
+      skipped = 4;
+
+      window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
+      a.b.next = a.b.__iterator__ = function() { };
+
+      result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
       deepEqual(result, ['a.b.y -> (number)'], 'custom __iterator__');
 
-      if (Object.defineProperty) {
+      if (has.descriptors) {
+        skipped = 0;
+
         window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
-        Object.defineProperty(a.b, '__iterator__', {
-          'enumerable': true,
-          'writable': true,
-          'value': function() { }
-        });
+        setDescriptor(a.b, '__iterator__', { 'writable': true, 'value': noop });
 
         result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
         deepEqual(result, ['a.b.y -> (number)'], 'non-configurable __iterator__');
 
         window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
-        Object.defineProperty(a.b, '__iterator__', {
-          'configurable': true,
-          'enumerable': true,
-          'value': function() { }
-        });
+        setDescriptor(a.b, '__iterator__', { 'configurable': true, 'value': noop });
 
         result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
         deepEqual(result, ['a.b.y -> (number)'], 'non-writable __iterator__');
+        deepEqual(getDescriptor(a.b, '__iterator__'), {
+          'configurable': true,
+          'enumerable': false,
+          'writable': false,
+          'value': noop
+        }, 'unchanged descriptor');
 
         window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
-        Object.defineProperty(a.b, '__iterator__', {
-          'enumerable': true,
-          'value': function() { }
-        });
+        setDescriptor(a.b, '__iterator__', { 'value': noop });
 
         result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
-        deepEqual(result, [], 'non-configurable and non-writable __iterator__');
+        deepEqual(result, [], 'non-configurable/writable __iterator__');
       }
-    } else {
-      ok(true, 'test skipped');
-      ok(true, 'test skipped');
-      ok(true, 'test skipped');
+    }
+    while (skipped--) {
       ok(true, 'test skipped');
     }
   });
@@ -276,7 +289,7 @@
     result = simplify(spotlight.byName('constructor', { 'object': a.prototype, 'path': '<a.prototype>' }));
     deepEqual(result, [], 'IE < 9 prototype.constructor (alt)');
 
-    window.a = { };
+    window.a = {};
 
     result = simplify(spotlight.byName('a', { 'object': window.window }));
     expected = [rootName + '.a -> (object)'];
