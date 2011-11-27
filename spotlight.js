@@ -109,7 +109,9 @@
       // test must use a non-native constructor to catch the Safari 2 issue
       function Klass() { this.valueOf = 0; };
       var count = Klass.prototype.valueOf = 0;
-      for (var key in new Klass) { count++; }
+      for (var key in new Klass) {
+        count += key == 'valueOf' ? 1 : 0;
+      }
       return count;
     }());
 
@@ -122,15 +124,14 @@
 
     // IE < 9 skips enumerable properties shadowing non-enumerable ones
     var forOwnShadowed = flag == 0 &&
-      function(object, callback, owner) {
+      function(object, callback, skipCtor) {
         // because IE < 9 can't set the [[Enumerable]] attribute of an existing
         // property and the `constructor` property of a prototype defaults to
         // non-enumerable, we manually skip the `constructor` property when
         // iterating over a `prototype` object.
-        var skipCtor = isFunction(owner) && isObject(object);
         for (var key, i = 0; key = shadowed[i]; i++) {
           if (hasKey(object, key) &&
-              !(skipCtor && key == shadowed[0]) &&
+              !(skipCtor && key == 'constructor') &&
               callback(object[key], key, object) === false) {
             break;
           }
@@ -138,7 +139,7 @@
       };
 
     // lazy define
-    forOwn = function(object, callback, owner) {
+    forOwn = function(object, callback, skipCtor) {
       var done,
           iterator,
           key,
@@ -205,7 +206,7 @@
         }
       }
       if (!done && forOwnShadowed) {
-        forOwnShadowed(object, callback, owner);
+        forOwnShadowed(object, callback, skipCtor);
       }
     };
     forOwn.apply(null, arguments);
@@ -366,11 +367,11 @@
     options || (options = {});
 
     var data,
-        owner,
         pool,
         pooled,
         queue,
         separator,
+        skipCtor,
         roots = defaultRoots.slice(),
         object = options.object || roots[0].object,
         path = options.path,
@@ -394,7 +395,7 @@
       object = data.object;
       path = data.path;
       queue = [{ 'object': object, 'path': path, 'pool': [object] }];
-      owner = /(?:^|[\W_])prototype[\W_]*$/i.test(path) && callback;
+      skipCtor = /(?:^|[\W_])prototype[\W_]*$/i.test(path);
 
       // a non-recursive solution to avoid call stack limits
       // http://www.jslab.dk/articles/non.recursive.preorder.traversal.part4
@@ -435,11 +436,10 @@
             }
           } catch(e) { }
         },
-        // attempt to handle an edge case where a function prototype is provided
-        // via `options.object` by guesstimating, based on its `options.path` to
-        // be a function prototype then supply a dummy function to trigger
-        // `forOwn()`'s `skipCtor` flag.
-        data.pool.length == 1 && owner);
+        // pass a flag to skip the `constructor` property of a function's prototype
+        // object when the prototype object is passed via `options.object` by
+        // guesstimating, based on its `options.path`
+        skipCtor);
       }
     }
     return result;
