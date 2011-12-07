@@ -99,9 +99,8 @@
   function forOwn() {
     // list of possible shadowed properties of Object.prototype
     var shadowed = [
-      'constructor', 'hasOwnProperty', 'isPrototypeOf',
-      'propertyIsEnumerable', 'toLocaleString',
-      'toString', 'valueOf'
+      'constructor', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable',
+      'toLocaleString', 'toString', 'valueOf'
     ];
 
     // flag for..in bugs
@@ -122,16 +121,17 @@
         return hasKey(seen, key) || !(seen[key] = true);
       };
 
-    // IE < 9 makes properties, shadowing non-enumerable ones, non-enumerable too
-    var forOwnShadowed = flag == 0 &&
+    // IE < 9 incorrectly makes an object's properties non-enumerable if they have
+    // the same name as other non-enumerable properties in its prototype chain.
+    var forShadowed = flag == 0 &&
       function(object, callback, skipCtor) {
-        // because IE < 9 can't set the [[Enumerable]] attribute of an existing
+        // Because IE < 9 can't set the [[Enumerable]] attribute of an existing
         // property and the `constructor` property of a prototype defaults to
         // non-enumerable, we manually skip the `constructor` property when
         // iterating over a `prototype` object.
-        for (var key, i = 0; key = shadowed[i]; i++) {
-          if (hasKey(object, key) &&
-              !(skipCtor && key == 'constructor') &&
+        for (var key, index = 0; key = shadowed[index]; index++) {
+          if (!(skipCtor && key == 'constructor') &&
+              hasKey(object, key) &&
               callback(object[key], key, object) === false) {
             break;
           }
@@ -193,21 +193,21 @@
             continue;
           }
         }
-        // Firefox < 3.6, Opera > 9.50 - Opera < 12, and Safari < 5.1
+        // Firefox < 3.6, Opera > 9.50 - Opera < 11.60, and Safari < 5.1
         // (if the prototype or a property on the prototype has been set)
         // incorrectly set a function's `prototype` property [[Enumerable]] value
         // to true. Because of this we standardize on skipping the the `prototype`
         // property of functions regardless of their [[Enumerable]] value.
         if (done =
+            !(skipProto && key == 'prototype') &&
             !(hasSeen && hasSeen(seen, key)) &&
             (iterator || hasKey(object, key)) &&
-            !(skipProto && key == 'prototype') &&
             callback(value, key, object) === false) {
           break;
         }
       }
-      if (!done && forOwnShadowed) {
-        forOwnShadowed(object, callback, skipCtor);
+      if (!done && forShadowed) {
+        forShadowed(object, callback, skipCtor);
       }
     };
     forOwn.apply(null, arguments);
