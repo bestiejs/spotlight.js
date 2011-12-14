@@ -15,9 +15,14 @@
 
   /** The `spotlight` object to test */
   var spotlight =
-    window.spotlight ||
-    load('../spotlight.js') ||
-    window.spotlight;
+    window.spotlight || (
+      !Object._getOwnPropertyNames || (
+        Object._getOwnPropertyNames = Object.getOwnPropertyNames,
+        Object.getOwnPropertyNames = null
+      ),
+      load('../spotlight.js'),
+      window.spotlight
+    );
 
   /** The root name for the environment */
   var rootName =

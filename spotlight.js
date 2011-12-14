@@ -16,6 +16,9 @@
   /** Detect free variable `global` */
   freeGlobal = typeof global == 'object' && global && (global == global.global ? (window = global) : global),
 
+  /** Used to crawl all properties regardless of enumerability */
+  getAllKeys = Object.getOwnPropertyNames,
+
   /** Used to get __iterator__ descriptors */
   getDescriptor = Object.getOwnPropertyDescriptor,
 
@@ -50,11 +53,21 @@
   /** Used to flag features */
   has = {
 
+    /** Detect if strings support accessing characters by index */
+    'charByIndex': '0'[0] == '0',
+
     /** Detect ES5+ property descriptor API */
     'descriptors' : !!(function() {
       try {
         var o = {};
         return (setDescriptor(o, o, o), 'value' in getDescriptor(o, o));
+      } catch(e) { }
+    }()),
+
+    /** Detect ES5+ Object.getOwnPropertyNames() */
+    'getAllKeys': !!(function() {
+      try {
+        return /\bvalueOf\b/.test(getAllKeys(Object.prototype));
       } catch(e) { }
     }()),
 
@@ -90,45 +103,73 @@
   }
 
   /**
+   * Iterates over array-like-objects.
+   * Callbacks may terminate the loop by explicitly returning `false`.
+   * @private
+   * @param {Object} object The object to iterate over and pass to the callback.
+   * @param {Function} callback The function called per iteration.
+   * @param {Object} [iteratee=`object`] An alternate object to iterate over.
+   * @returns {Boolean|Undefined} Returns `false` if the loop was terminated, else `undefined`.
+   */
+  function forArrayLike(object, callback, iteratee) {
+    iteratee || (iteratee = object);
+    for (var index = 0, length = object.length; index < length; index++) {
+      if (callback(iteratee[index], String(index), object) === false) {
+        // return `false` is needed for use in `forOwn()`
+        return false;
+      }
+    }
+  }
+
+  /**
    * Iterates over an object's own properties, executing the `callback` for each.
+   * Callbacks may terminate the loop by explicitly returning `false`.
    * @private
    * @param {Object} object The object to iterate over.
    * @param {Function} callback A function executed per own property.
-   * @param {Mixed} [owner=null] The owner of the `object`.
    */
   function forOwn() {
-    // list of possible shadowed properties of Object.prototype
-    var shadowed = [
-      'constructor', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable',
-      'toLocaleString', 'toString', 'valueOf'
-    ];
+    var enumFlag = 0,
+        forArgs = forArrayLike,
+        forShadowed = false,
+        forString = !has.charByIndex && forArrayLike,
+        hasSeen = false,
+        shadowed = ['constructor', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'toLocaleString', 'toString', 'valueOf'];
 
-    // flag for..in bugs
-    var flag;
-    (function() {
-      // test must use a non-native constructor to catch the Safari 2 issue
-      function Klass() { this.valueOf = 0; }
-      flag = Klass.prototype.valueOf = 0;
-      for (var key in new Klass) {
-        flag += key == 'valueOf' ? 1 : 0;
+    (function(key) {
+      // must use a non-native constructor to catch the Safari 2 issue
+      function Klass() { this.valueOf = 0; };
+      Klass.prototype.valueOf = 0;
+      // check various for..in bugs
+      for (key in new Klass) {
+        enumFlag += key == 'valueOf' ? 1 : 0;
       }
-    }());
+      // check if `arguments` objects have non-enumerable indexes
+      for (key in arguments) {
+        key == '0' && (forArgs = false);
+      }
+    }(0));
 
     // Safari 2 iterates over shadowed properties twice
     // http://replay.waybackmachine.org/20090428222941/http://tobielangel.com/2007/1/29/for-in-loop-broken-in-safari/
-    var hasSeen = flag == 2 &&
-      function(seen, key) {
+    if (enumFlag == 2) {
+      hasSeen = function(seen, key) {
         return hasKey(seen, key) || !(seen[key] = true);
       };
-
+    }
     // IE < 9 incorrectly makes an object's properties non-enumerable if they have
     // the same name as other non-enumerable properties in its prototype chain.
-    var forShadowed = flag == 0 &&
-      function(object, callback, skipCtor) {
-        // Because IE < 9 can't set the [[Enumerable]] attribute of an existing
+    else if (!enumFlag) {
+      forShadowed = function(object, callback) {
+        // Because IE < 9 can't set the `[[Enumerable]]` attribute of an existing
         // property and the `constructor` property of a prototype defaults to
-        // non-enumerable, we manually skip the `constructor` property when
-        // iterating over a `prototype` object.
+        // non-enumerable, we manually skip the `constructor` property when we
+        // think we are iterating over a `prototype` object.
+        try {
+          var ctor = object.constructor,
+              skipCtor = ctor && ctor.prototype && ctor.prototype.constructor === ctor;
+        } catch(e) { }
+
         for (var key, index = 0; key = shadowed[index]; index++) {
           if (!(skipCtor && key == 'constructor') &&
               hasKey(object, key) &&
@@ -137,18 +178,44 @@
           }
         }
       };
+    }
 
     // lazy define
-    forOwn = function(object, callback, skipCtor) {
-      var done,
-          iterator,
+    forOwn = function(object, callback) {
+      var iterator,
           key,
+          length,
           value,
+          done = !object,
+          index = -1,
+          keys = [],
           seen = {},
           skipProto = isFunction(object);
 
       object = Object(object);
 
+      // if possible search all properties
+      if (has.getAllKeys) {
+        try {
+          keys = getAllKeys(object);
+        } catch(e) { }
+
+        if ((length = keys.length)) {
+          while (++index < length) {
+            key = keys[index];
+            try {
+              value = object[key];
+            } catch(e) {
+              continue;
+            }
+            if (callback(value, key, object) === false) {
+              break;
+            }
+          }
+          return;
+        }
+      }
+      // else search only enumerable properties
       try {
         // avoid problems with iterators
         // https://github.com/ringo/ringojs/issues/157
@@ -206,8 +273,15 @@
           break;
         }
       }
+      // in IE < 9 strings don't support accessing characters by index
+      if (!done && forString && toString.call(object) == '[object String]') {
+        done = forString(object, callback, object.split('')) === false;
+      }
+      else if (!done && forArgs && isArguments(object)) {
+        done = forArgs(object, callback) === false;
+      }
       if (!done && forShadowed) {
-        forShadowed(object, callback, skipCtor);
+        forShadowed(object, callback);
       }
     };
     forOwn.apply(null, arguments);
@@ -219,7 +293,7 @@
    * like "Constructor" and "Global" .
    * @private
    * @param {Mixed} value The value to check.
-   * @returns {String} Returns the value's [[Class]] or "Null" or "Undefined".
+   * @returns {String} Returns a string representing the kind of `value`.
    */
   function getKindOf(value) {
     var result;
@@ -232,11 +306,16 @@
     else if (isFunction(value) && isHostType(value, 'prototype')) {
       // a function is assumed of kind "Constructor" if it has its own
       // enumerable prototype properties or doesn't have a [[Class]] of Object
-      if (toString.call(value.prototype) == '[object Object]') {
-        forOwn(value.prototype, function() { return !(result = 'Constructor'); }, value);
-      } else {
-        result = 'Constructor';
-      }
+      try {
+        if (toString.call(value.prototype) == '[object Object]') {
+          for (var key in value.prototype) {
+            result = 'Constructor';
+            break;
+          }
+        } else {
+          result = 'Constructor';
+        }
+      } catch(e) { }
     }
     return result || (toString.call(value).match(/^\[object (.*?)\]$/) || 0)[1] ||
       (result = typeof value, result.charAt(0).toUpperCase() + result.slice(1))
@@ -284,6 +363,25 @@
       };
     }
     return hasKey.apply(null, arguments);
+  }
+
+  /**
+   * Checks if a value is an `arguments` object.
+   * @private
+   * @param {Mixed} value The value to check.
+   * @returns {Boolean} Returns `true` if the value is an `arguments` object, else `false`.
+   */
+  function isArguments() {
+    // lazy define
+    isArguments = function(value) {
+      return toString.call(value) == '[object Arguments]';
+    };
+    if (!isArguments(arguments)) {
+      isArguments = function(value) {
+        return !!value && hasKey(value, 'callee');
+      };
+    }
+    return isArguments(arguments[0]);
   }
 
   /**
@@ -372,7 +470,6 @@
         pooled,
         queue,
         separator,
-        skipCtor,
         roots = defaultRoots.slice(),
         object = options.object || roots[0].object,
         path = options.path,
@@ -396,7 +493,6 @@
       object = data.object;
       path = data.path;
       queue = [{ 'object': object, 'path': path, 'pool': [object] }];
-      skipCtor = /(?:^|[\W_])prototype[\W_]*$/i.test(path);
 
       // a non-recursive solution to avoid call stack limits
       // http://www.jslab.dk/articles/non.recursive.preorder.traversal.part4
@@ -436,11 +532,7 @@
               log('text', result[result.length - 1][0], value);
             }
           } catch(e) { }
-        },
-        // pass a flag to skip the `constructor` property of a function's prototype
-        // object when the prototype object is passed via `options.object` by
-        // guesstimating, based on its `options.path`
-        skipCtor);
+        });
       }
     }
     return result;
@@ -476,7 +568,10 @@
       if (document || !spotlight.debug) {
         // because `console.log` is a host method we don't assume `.apply()` exists
         if (argCount < 2) {
-          value = JSON ? JSON.stringify(value) : value;
+          if (JSON) {
+            value = [JSON.stringify(value), value];
+            value = value[0] == 'null' ? value[1] : value[0];
+          }
           console[method](message + (type == 'error' ? '' : ' ' + value));
         } else {
           console[method](message, value);
