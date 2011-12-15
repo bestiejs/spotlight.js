@@ -7,8 +7,11 @@
  */
 ;(function(window, undefined) {
 
+  /** Backup possible window/global object */
+  var oldWin = window,
+
   /* Used as the starting point(s) for the object crawler */
-  var defaultRoots = [{ 'object': window, 'path': 'window' }],
+  defaultRoots = [{ 'object': window, 'path': 'window' }],
 
   /** Detect free variable `exports` */
   freeExports = typeof exports == 'object' && exports,
@@ -39,8 +42,10 @@
     },
     'kind': function(value, key, object) {
       var kind = [value, value = object[key]][0];
-      return isFunction(kind) ? value instanceof kind :
-        typeof value == kind || getKindOf(value).toLowerCase() == kind.toLowerCase();
+      return kind == '*' || (isFunction(kind)
+        ? value instanceof kind
+        : typeof value == kind || getKindOf(value).toLowerCase() == kind.toLowerCase()
+      );
     },
     'name': function(value, key, object) {
       return value == key;
@@ -52,9 +57,6 @@
 
   /** Used to flag features */
   has = {
-
-    /** Detect if strings support accessing characters by index */
-    'charByIndex': '0'[0] == '0',
 
     /** Detect ES5+ property descriptor API */
     'descriptors' : !!(function() {
@@ -106,15 +108,13 @@
    * Iterates over array-like-objects.
    * Callbacks may terminate the loop by explicitly returning `false`.
    * @private
-   * @param {Object} object The object to iterate over and pass to the callback.
+   * @param {Object} object The object to iterate over.
    * @param {Function} callback The function called per iteration.
-   * @param {Object} [iteratee=`object`] An alternate object to iterate over.
    * @returns {Boolean|Undefined} Returns `false` if the loop was terminated, else `undefined`.
    */
-  function forArrayLike(object, callback, iteratee) {
-    iteratee || (iteratee = object);
+  function forArrayLike(object, callback) {
     for (var index = 0, length = object.length; index < length; index++) {
-      if (callback(iteratee[index], String(index), object) === false) {
+      if (callback(object[index], String(index), object) === false) {
         // return `false` is needed for use in `forOwn()`
         return false;
       }
@@ -132,7 +132,6 @@
     var enumFlag = 0,
         forArgs = forArrayLike,
         forShadowed = false,
-        forString = !has.charByIndex && forArrayLike,
         hasSeen = false,
         shadowed = ['constructor', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'toLocaleString', 'toString', 'valueOf'];
 
@@ -273,11 +272,7 @@
           break;
         }
       }
-      // in IE < 9 strings don't support accessing characters by index
-      if (!done && forString && toString.call(object) == '[object String]') {
-        done = forString(object, callback, object.split('')) === false;
-      }
-      else if (!done && forArgs && isArguments(object)) {
+      if (!done && forArgs && isArguments(object)) {
         done = forArgs(object, callback) === false;
       }
       if (!done && forShadowed) {
@@ -711,10 +706,15 @@
   // mod `defaultRoots` for server-side environments
   // for Narwhal, Node.js, or RingoJS
   if (freeExports && freeGlobal) {
-    defaultRoots = [
-      { 'object': freeExports, 'path': 'exports' },
-      { 'object': freeGlobal, 'path': 'global' }
-    ];
+    defaultRoots = [{ 'object': freeGlobal, 'path': 'global' }];
+    // for the Narwhal REPL
+    if (oldWin != freeGlobal) {
+      defaultRoots.unshift({ 'object': oldWin, 'path': '<module scope>' });
+    }
+    // avoid explicitly crawling exports if it's crawled indirectly
+    if (!(has.getAllKeys && (freeGlobal.exports == freeExports || oldWin.exports == freeExports))) {
+      defaultRoots.unshift({ 'object': freeExports, 'path': 'exports' });
+    }
   }
   // for Rhino
   else if (getKindOf(window.environment) == 'Environment') {

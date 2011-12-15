@@ -15,14 +15,9 @@
 
   /** The `spotlight` object to test */
   var spotlight =
-    window.spotlight || (
-      !Object._getOwnPropertyNames || (
-        Object._getOwnPropertyNames = Object.getOwnPropertyNames,
-        Object.getOwnPropertyNames = null
-      ),
-      load('../spotlight.js'),
-      window.spotlight
-    );
+    window.spotlight ||
+    load('../spotlight.js') ||
+    window.spotlight;
 
   /** The root name for the environment */
   var rootName =
@@ -98,7 +93,7 @@
       }())
     };
 
-    if (has.iterators) {
+    if (has.iterators && !Object.getOwnPropertyNames) {
       skipped = 4;
 
       window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
@@ -283,22 +278,25 @@
     expected = ['<object>.b.toString -> (function)'];
     deepEqual(result, expected, 'custom toString');
 
-    window.a = function() { };
-
-    result = simplify(spotlight.byName('prototype', { 'object': a }));
-    deepEqual(result, [], 'skips prototype');
-
-    result = simplify(spotlight.byName('constructor', { 'object': a.prototype, 'path': 'a.prototype' }));
-    deepEqual(result, [], 'IE < 9 prototype.constructor');
-
-    result = simplify(spotlight.byName('constructor', { 'object': a.prototype, 'path': '<a.prototype>' }));
-    deepEqual(result, [], 'IE < 9 prototype.constructor (alt)');
-
     window.a = {};
 
     result = simplify(spotlight.byName('a', { 'object': window.window }));
     expected = [rootName + '.a -> (object)'];
     deepEqual(result.slice(0, 1), expected, 'Opera < 10.53 window');
+
+    if (Object.getOwnPropertyNames) {
+      ok(true, 'test skipped');
+      ok(true, 'test skipped');
+    }
+    else {
+      window.a = function() { };
+
+      result = simplify(spotlight.byName('prototype', { 'object': a }));
+      deepEqual(result, [], 'skips prototype');
+
+      result = simplify(spotlight.byName('constructor', { 'object': a.prototype, 'path': 'a.prototype' }));
+      deepEqual(result, [], 'IE < 9 prototype.constructor');
+    }
   });
 
   /*--------------------------------------------------------------------------*/

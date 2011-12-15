@@ -20,11 +20,6 @@
 				}
 				Object.prototype.hasOwnProperty = hasOwnProperty;
 			}
-			// allows testing for..in enumeration issues
-			if (Object.getOwnPropertyNames) {
-				Object._getOwnPropertyNames = Object.getOwnPropertyNames;
-				Object.getOwnPropertyNames = null;
-			}
 		}());
 		</script>
 		<script src="../vendor/qunit/qunit/qunit.js"></script>
