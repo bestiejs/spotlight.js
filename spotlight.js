@@ -304,24 +304,25 @@
     // lazy define for modern browsers
     if (isFunction(hasOwnProperty)) {
       hasKey = function(object, key) {
-        return hasOwnProperty.call(Object(object), key);
+        return object != null && hasOwnProperty.call(Object(object), key);
       };
     }
     // or for Safari 2
     else if ({}.__proto__ == Object.prototype) {
       hasKey = function(object, key) {
-        var result;
-        object = Object(object);
-        object.__proto__ = [object.__proto__, object.__proto__ = null, result = key in object][0];
+        var result = false;
+        if (object != null) {
+          object = Object(object);
+          object.__proto__ = [object.__proto__, object.__proto__ = null, result = key in object][0];
+        }
         return result;
       };
     }
     // or for others (not as accurate)
     else {
       hasKey = function(object, key) {
-        object = Object(object);
-        var parent = (object.constructor || Object).prototype;
-        return key in object && !(key in parent && object[key] === parent[key]);
+        var parent = object != null && (object.constructor || Object).prototype;
+        return !!parent && key in Object(object) && !(key in parent && object[key] === parent[key]);
       };
     }
     // or for an Opera < 10.53 bug, found by Garrett Smith, that occurs with
