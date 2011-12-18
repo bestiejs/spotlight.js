@@ -204,10 +204,14 @@
 
     deepEqual(result.slice(0, 3), expected, 'multiple matches');
 
-    window.a = { 'foo': { 'b': { 'foo': { 'c': { 'foo': null } } } } };
+    window.a = {
+      'foo': { 'b': { 'foo': { 'c': { } } } },
+      'bar': { 'b': { } }
+    };
     a.foo.b.foo.c.foo = a;
+    a.bar.b = a.foo.b;
 
-    // qunit can't handle circular references :/
+    // QUnit can't handle circular references :/
     result = simplify(spotlight.byName('foo'));
     expected = [
       rootName + '.a.foo -> (object)',
@@ -216,6 +220,13 @@
     ];
 
     deepEqual(result.slice(0, 3), expected, 'circular references');
+
+    expected = [
+      rootName + '.a.bar.b.foo -> (object)',
+      rootName + '.a.bar.b.foo.c.foo -> (<' + rootName + '.a>)'
+    ];
+
+    deepEqual(result.slice(3, 5), expected, 'sibling containing circular references');
 
     result = spotlight.byName(12);
     strictEqual(result, null, 'incorrect argument');
