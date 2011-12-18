@@ -206,27 +206,42 @@
 
     window.a = {
       'foo': { 'b': { 'foo': { 'c': { } } } },
-      'bar': { 'b': { } }
+      'bar': { }
     };
     a.foo.b.foo.c.foo = a;
     a.bar.b = a.foo.b;
 
     // QUnit can't handle circular references :/
     result = simplify(spotlight.byName('foo'));
+
     expected = [
       rootName + '.a.foo -> (object)',
       rootName + '.a.foo.b.foo -> (object)',
       rootName + '.a.foo.b.foo.c.foo -> (<' + rootName + '.a>)'
     ];
 
-    deepEqual(result.slice(0, 3), expected, 'circular references');
+    var filtered = [];
+    for (var index = 0, length = result.length; index < length; index++) {
+      if (/a\.foo/.test(result[index])) {
+        filtered.push(result[index]);
+      }
+    }
+
+    deepEqual(filtered.sort(), expected, 'circular references');
 
     expected = [
       rootName + '.a.bar.b.foo -> (object)',
       rootName + '.a.bar.b.foo.c.foo -> (<' + rootName + '.a>)'
     ];
 
-    deepEqual(result.slice(3, 5), expected, 'sibling containing circular references');
+    filtered = [];
+    for (var index = 0, length = result.length; index < length; index++) {
+      if (/a\.bar/.test(result[index])) {
+        filtered.push(result[index]);
+      }
+    }
+
+    deepEqual(filtered.sort(), expected, 'sibling containing circular references');
 
     result = spotlight.byName(12);
     strictEqual(result, null, 'incorrect argument');
