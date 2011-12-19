@@ -477,17 +477,16 @@
         forOwn(object, function(value, key) {
           // inspect objects
           if (isObject(value)) {
-            // clone current pool per prop on the current `object` to avoid siblings
-            // polluting each others object pools
+            // clone current pool per prop on the current `object` to avoid
+            // sibling properties from polluting each others object pools
             pool = data.pool.slice();
 
-            // check if already pooled (prevents circular references)
-            // console.log('debug:', path, key, data.pool.length, data.pool.slice());
+            // check if already pooled (prevents infinite loops when handling circular references)
             pooled = filterOne(pool, function(data) {
               return value == data.object;
             });
 
-            // add to "call" queue
+            // add to the "call" queue
             if (!pooled) {
               pool.push({ 'object': value, 'path': path + separator + key, 'pool': pool });
               queue.push(pool[pool.length - 1]);
