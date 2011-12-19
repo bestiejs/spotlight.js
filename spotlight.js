@@ -269,6 +269,7 @@
    */
   function getKindOf(value) {
     var result;
+
     if (value == null) {
       result = value === null ? 'Null' : 'Undefined';
     }
@@ -389,20 +390,21 @@
    * @returns {Boolean} Returns `true` if `value` is an object, else `false`.
    */
   function isObject(value) {
-    var constructor,
-        result = toString.call(value) == '[object Object]';
+    var ctor,
+        result = !!value && toString.call(value) == '[object Object]';
 
     // some objects like `window.java` may kill script execution when checking
     // for their constructor, so we filter by [[Class]] first
     if (result) {
-      // some properties throw errors when accessed
-      try {
-        constructor = value && value.constructor;
-      } catch(e) { }
       // IE < 9 presents nodes like Object objects:
       // IE < 8 are missing the node's constructor property
       // IE 8 node constructors are typeof "object"
-      result = constructor && typeof constructor != 'object';
+      try {
+        // some properties throw errors when accessed
+        ctor = value.constructor;
+      } catch(e) { }
+      // check if the constructor is `Object` as `Object instanceof Object` is `true`
+      result = isFunction(ctor) && ctor instanceof ctor;
     }
     return result;
   }
