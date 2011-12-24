@@ -471,7 +471,7 @@
 
       // a non-recursive solution to avoid call stack limits
       // http://www.jslab.dk/articles/non.recursive.preorder.traversal.part4
-      while ((data = queue.pop())) {
+      while ((data = queue.shift())) {
         object = data.object;
         path = data.path;
         separator = path ? '.' : '';
