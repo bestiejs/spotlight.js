@@ -121,7 +121,7 @@
       // must use a non-native constructor to catch the Safari 2 issue
       function Klass() { this.valueOf = 0; };
       Klass.prototype.valueOf = 0;
-      // check various for..in bugs
+      // check various for-in bugs
       for (key in new Klass) {
         enumFlag += key == 'valueOf' ? 1 : 0;
       }
