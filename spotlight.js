@@ -466,18 +466,18 @@
     }
     // crawl all root objects
     while ((data = roots.pop())) {
-      index = -1;
+      index = 0;
       object = data.object;
       path = data.path;
-      queue = { '0': { 'object': object, 'path': path, 'pool': [object] }, 'length': 1 };
+      data = { 'object': object, 'path': path, 'pool': [object] };
+      queue = [];
 
       // a non-recursive solution to avoid call stack limits
       // http://www.jslab.dk/articles/non.recursive.preorder.traversal.part4
-      while ((data = queue[++index])) {
+      do {
         object = data.object;
         path = data.path;
         separator = path ? '.' : '';
-        delete queue[index - 1];
 
         forOwn(object, function(value, key) {
           // inspect objects
@@ -490,11 +490,10 @@
             pooled = filterOne(pool, function(data) {
               return value == data.object;
             });
-
             // add to the "call" queue
             if (!pooled) {
               pool.push({ 'object': value, 'path': path + separator + key, 'pool': pool });
-              queue[queue.length++] = pool[pool.length - 1];
+              queue[queue.length] = pool[pool.length - 1];
             }
           }
           // if filter passed, log it
@@ -510,7 +509,7 @@
             }
           } catch(e) { }
         });
-      }
+      } while ((data = queue[index++]));
     }
     return result;
   }
