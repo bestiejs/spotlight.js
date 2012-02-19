@@ -1,6 +1,7 @@
 <!doctype html>
-<html>
+<html lang="en">
 	<head>
+		<meta charset="utf-8">
 		<title>Spotlight.js Test Suite</title>
 		<link rel="stylesheet" href="../vendor/qunit/qunit/qunit.css">
 	</head>
@@ -11,46 +12,46 @@
 		<h2 id="qunit-userAgent"></h2>
 		<ol id="qunit-tests"></ol>
 		<script>
-		(function() {
-			var hasOwnProperty = function hasOwnProperty(key) {
-				var parent = (this.constructor || Object).prototype;
-				return key in this && !(key in parent && this[key] === parent[key]);
-			};
-			if (typeof {}.hasOwnProperty != 'function') {
-				// redefine for Safari 2, else use the less accurate fallback for others
-				if ({}.__proto__ == Object.prototype) {
-					hasOwnProperty = function hasOwnProperty(key) {
-						var result;
-						this.__proto__ = [this.__proto__, this.__proto__ = null, result = key in this][0];
-						return result;
-					};
+			(function() {
+				var hasOwnProperty = function hasOwnProperty(key) {
+					var parent = (this.constructor || Object).prototype;
+					return key in this && !(key in parent && this[key] === parent[key]);
+				};
+				if (typeof {}.hasOwnProperty != 'function') {
+					// redefine for Safari 2, else use the less accurate fallback for others
+					if ({}.__proto__ == Object.prototype) {
+						hasOwnProperty = function hasOwnProperty(key) {
+							var result;
+							this.__proto__ = [this.__proto__, this.__proto__ = null, result = key in this][0];
+							return result;
+						};
+					}
+					Object.prototype.hasOwnProperty = hasOwnProperty;
 				}
-				Object.prototype.hasOwnProperty = hasOwnProperty;
-			}
-		}());
+			}());
 		</script>
 		<script src="../vendor/qunit/qunit/qunit.js"></script>
 		<script>var spotlight2;</script>
 		<script src="../spotlight.js"></script>
 		<script src="../vendor/requirejs/require.js"></script>
 		<script>
-		if (/[?&]norequire=true(?:&|$)/.test(location.search)) {
-			require = define = null;
-			document.write('<script src="tests.js"><\/script>');
-		}
-		else {
-			require({
-				'baseUrl': '../vendor/requirejs/',
-				'urlArgs': 't=' + (+new Date),
-				'paths': {
-					'spotlight': '../../spotlight'
-				}
-			},
-			['spotlight'], function(spotlight) {
-				spotlight2 = spotlight;
-				require(['tests.js']);
-			});
-		}
+			if (/[?&]norequire=true(?:&|$)/.test(location.search)) {
+				require = define = null;
+				document.write('<script src="test.js"><\/script>');
+			}
+			else {
+				require({
+					'baseUrl': '../vendor/requirejs/',
+					'urlArgs': 't=' + (+new Date),
+					'paths': {
+						'spotlight': '../../spotlight'
+					}
+				},
+				['spotlight'], function(spotlight) {
+					spotlight2 = spotlight;
+					require(['test.js']);
+				});
+			}
 		</script>
 	</body>
 </html>
