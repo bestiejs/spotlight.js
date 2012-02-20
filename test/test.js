@@ -40,6 +40,17 @@
     return result;
   }
 
+  /**
+   * Skips a given number of tests with a passing result.
+   * @private
+   * @param {Number} count The number of tests to skip.
+   */
+  function skipTest(count) {
+    while (count--) {
+      ok(true, 'test skipped');
+    }
+  }
+
   /*--------------------------------------------------------------------------*/
 
   // enable debug mode so `spotlight` methods return an array of log calls
@@ -130,9 +141,7 @@
         deepEqual(result, [], 'non-configurable/writable __iterator__');
       }
     }
-    while (skipped--) {
-      ok(true, 'test skipped');
-    }
+    skipTest(skipped);
   });
 
   /*--------------------------------------------------------------------------*/
@@ -311,8 +320,7 @@
     deepEqual(result.slice(0, 1), expected, 'Opera < 10.53 window');
 
     if (Object.getOwnPropertyNames) {
-      ok(true, 'test skipped');
-      ok(true, 'test skipped');
+      skipTest(2);
     }
     else {
       window.a = function() { };
@@ -331,7 +339,7 @@
     if (window.document && window.require) {
       strictEqual((spotlight2 || {}).debug, false, 'require("spotlight")');
     } else {
-      ok(true, 'test skipped');
+      skipTest(1);
     }
   });
 

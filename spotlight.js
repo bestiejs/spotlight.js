@@ -8,34 +8,35 @@
 ;(function(window, undefined) {
 
   /** Backup possible window/global object */
-  var oldWin = window,
+  var oldWin = window;
 
   /* Used as the starting point(s) for the object crawler */
-  defaultRoots = [{ 'object': window, 'path': 'window' }],
+  var defaultRoots = [{ 'object': window, 'path': 'window' }];
 
   /** Detect free variable `exports` */
-  freeExports = typeof exports == 'object' && exports,
+  var freeExports = typeof exports == 'object' && exports;
 
   /** Detect free variable `global` */
-  freeGlobal = typeof global == 'object' && global && (global == global.global ? (window = global) : global),
+  var freeGlobal = typeof global == 'object' && global &&
+    (global == global.global ? (window = global) : global);
 
   /** Used to crawl all properties regardless of enumerability */
-  getAllKeys = Object.getOwnPropertyNames,
+  var getAllKeys = Object.getOwnPropertyNames;
 
   /** Used to get __iterator__ descriptors */
-  getDescriptor = Object.getOwnPropertyDescriptor,
+  var getDescriptor = Object.getOwnPropertyDescriptor;
 
   /** Used in case an object doesn't have its own method */
-  hasOwnProperty = {}.hasOwnProperty,
+  var hasOwnProperty = {}.hasOwnProperty;
 
   /** Used to set __iterator__ descriptors */
-  setDescriptor = Object.defineProperty,
+  var setDescriptor = Object.defineProperty;
 
   /** Used to resolve a value's internal [[Class]] */
-  toString = {}.toString,
+  var toString = {}.toString;
 
   /** Filter functions used by `crawl()` */
-  filters = {
+  var filters = {
     'custom': function(value, key, object) {
       // the `this` binding is set by `crawl()`
       return value.call(this, object[key], key, object);
@@ -53,10 +54,10 @@
     'value': function(value, key, object) {
       return object[key] === value;
     }
-  },
+  };
 
   /** Used to flag features */
-  has = {
+  var has = {
 
     /** Detect ES5+ property descriptor API */
     'descriptors' : !!(function() {
