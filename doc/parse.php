@@ -21,6 +21,7 @@
   // generate Markdown
   $markdown = docdown(array(
     'path' => '../' . $file,
+    'title' => 'Spotlight.js <sup>v1.0.0-pre</sup>',
     'url'  => 'https://github.com/bestiejs/spotlight/blob/master/spotlight.js'
   ));
 

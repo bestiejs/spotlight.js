@@ -1,5 +1,5 @@
 /*!
- * Spotlight.js <http://github.com/bestiejs/spotlight.js/>
+ * Spotlight.js v1.0.0-pre <http://github.com/bestiejs/spotlight.js/>
  * Copyright 2011-2012 John-David Dalton <http://allyoucanleet.com/>
  * Based on Waldo <http://github.com/angus-c/waldo/>,
  * Copyright 2011-2012 Angus Croll <http://javascriptweblog.wordpress.com/>
@@ -669,6 +669,14 @@
      * @type Boolean
      */
     'debug': false,
+
+    /**
+     * The semantic version number.
+     * @static
+     * @memberOf spotlight
+     * @type String
+     */
+    'version': '1.0.0-pre',
 
     // searches for props by constructor instance, type, or [[Class]]
     'byKind': byKind,

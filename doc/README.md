@@ -1,4 +1,4 @@
-# Spotlight.js API documentation
+# Spotlight.js <sup>v1.0.0-pre</sup>
 
 <!-- div -->
 
@@ -8,6 +8,7 @@
 ## `spotlight`
 * [`spotlight`](#spotlight)
 * [`spotlight.debug`](#spotlight.debug)
+* [`spotlight.version`](#spotlight.version)
 * [`spotlight.byKind`](#spotlight.byKind)
 * [`spotlight.byName`](#spotlight.byName)
 * [`spotlight.byValue`](#spotlight.byValue)
@@ -39,6 +40,15 @@
 
 ### <a id="spotlight.debug" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L671" title="View in source">`spotlight.debug`</a>
 *(Boolean)*: A flag to indicate that methods will execute in debug mode.
+[&#9650;][1]
+
+<!-- /div -->
+
+
+<!-- div -->
+
+### <a id="spotlight.version" href="https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L679" title="View in source">`spotlight.version`</a>
+*(String)*: The semantic version number.
 [&#9650;][1]
 
 <!-- /div -->

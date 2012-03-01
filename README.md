@@ -1,4 +1,4 @@
-# Spotlight.js
+# Spotlight.js <sup>v1.0.0-pre</sup>
 
 An object crawler/property search library that works on nearly all JavaScript platforms<sup><a name="fnref1" href="#fn1">1</a></sup>.
 
