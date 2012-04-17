@@ -6,6 +6,7 @@
  * Both available under MIT license <http://mths.be/mit>
  */
 ;(function(window, undefined) {
+  'use strict';
 
   /** Backup possible window/global object */
   var oldWin = window;
@@ -91,6 +92,7 @@
 
   /**
    * Returns the first array value for which `callback` returns true.
+   *
    * @private
    * @param {Array} array The array to search.
    * @param {Function} callback A function executed per array value .
@@ -108,6 +110,7 @@
   /**
    * Iterates over an object's own properties, executing the `callback` for each.
    * Callbacks may terminate the loop by explicitly returning `false`.
+   *
    * @private
    * @param {Object} object The object to iterate over.
    * @param {Function} callback A function executed per own property.
@@ -264,6 +267,7 @@
    * Mimics ES 5.1's `Object.prototype.toString` behavior by returning the
    * value's [[Class]], "Null" or "Undefined" as well as other non-spec'ed results
    * like "Constructor" and "Global" .
+   *
    * @private
    * @param {Mixed} value The value to check.
    * @returns {String} Returns a string representing the kind of `value`.
@@ -297,6 +301,7 @@
 
   /**
    * Checks if an object has the specified key as a direct property.
+   *
    * @private
    * @param {Object} object The object to check.
    * @param {String} key The key to check for.
@@ -342,6 +347,7 @@
 
   /**
    * Checks if a value is an `arguments` object.
+   *
    * @private
    * @param {Mixed} value The value to check.
    * @returns {Boolean} Returns `true` if the value is an `arguments` object, else `false`.
@@ -361,6 +367,7 @@
 
   /**
    * Checks if the specified `value` is a function.
+   *
    * @private
    * @param {Mixed} value The value to check.
    * @returns {Boolean} Returns `true` if `value` is a function, else `false`.
@@ -373,6 +380,7 @@
    * Host objects can return type values that are different from their actual
    * data type. The objects we are concerned with usually return non-primitive
    * types of object, function, or unknown.
+   *
    * @private
    * @param {Mixed} object The owner of the property.
    * @param {String} property The property to check.
@@ -386,6 +394,7 @@
 
   /**
    * Checks if the specified `value` is an Object object.
+   *
    * @private
    * @param {Mixed} value The value to check.
    * @returns {Boolean} Returns `true` if `value` is an object, else `false`.
@@ -414,6 +423,7 @@
 
   /**
    * Performs argument type checks and calls `crawl()` with specified arguments.
+   *
    * @private
    * @param {String} name The name of the filter function passed.
    * @param {String} expected The data type expected of the given value.
@@ -431,6 +441,7 @@
 
   /**
    * Crawls environment objects logging all properties that pass the callback filter.
+   *
    * @private
    * @param {Function|String} callback A function executed per object encountered.
    * @param {Mixed} callbackArg An argument passed to the callback.
@@ -517,6 +528,7 @@
 
   /**
    * Logs a message to the console.
+   *
    * @private
    * @param {String} type The log type, either "text" or "error".
    * @param {String} message The log message.
@@ -576,6 +588,7 @@
   /**
    * Crawls environment objects logging all object properties whose values
    * are of a specified constructor instance, [[Class]], or type.
+   *
    * @memberOf spotlight
    * @param {Function|String} kind The constructor, [[Class]], or type to check against.
    * @param {Object} [options={}] The options object.
@@ -599,6 +612,7 @@
 
   /**
    * Crawls environment objects logging all object properties of the specified name.
+   *
    * @memberOf spotlight
    * @param {String} name The property name to search for.
    * @param {Object} [options={}] The options object.
@@ -621,6 +635,7 @@
   /**
    * Crawls environment objects logging all object properties whose values are
    * a strict match for the specified value.
+   *
    * @memberOf spotlight
    * @param {Mixed} value The value to search for.
    * @param {Object} [options={}] The options object.
@@ -640,6 +655,7 @@
    * Crawls environment objects executing `callback`, passing the current
    * `value`, `key`, and `object` as arguments, against each object encountered
    * and logs properties for which `callback` returns true.
+   *
    * @memberOf spotlight
    * @param {Function} callback A function executed per object.
    * @param {Object} [options={}] The options object.
@@ -659,12 +675,14 @@
 
   /**
    * The primary namespace.
+   *
    * @type Object
    */
   var spotlight = {
 
     /**
      * A flag to indicate that methods will execute in debug mode.
+     *
      * @memberOf spotlight
      * @type Boolean
      */
@@ -672,6 +690,7 @@
 
     /**
      * The semantic version number.
+     *
      * @static
      * @memberOf spotlight
      * @type String

@@ -27,7 +27,9 @@
   /*--------------------------------------------------------------------------*/
 
   /**
-   * Simplifies the debug return values of `spotlight` methods by filtering non-log messages.
+   * Simplifies the debug return values of `spotlight` methods by filtering
+   * non-log messages.
+   *
    * @private
    * @param {Array} result The result of a `spotlight` method.
    * @returns {Array} The filtered result.
@@ -42,6 +44,7 @@
 
   /**
    * Skips a given number of tests with a passing result.
+   * 
    * @private
    * @param {Number} count The number of tests to skip.
    */
