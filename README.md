@@ -102,7 +102,7 @@ cd spotlight.js
 git submodule update --init
 ~~~
 
-Feel free to fork if you see possible improvements!
+Feel free to fork and send pull requests if you see improvements!
 
 ## Footnotes
 
