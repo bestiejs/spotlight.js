@@ -59,7 +59,7 @@
   // enable debug mode so `spotlight` methods return an array of log calls
   spotlight.debug = true;
 
-  // must explicitly use `QUnit.module` instead of `module()`
+  // explicitly call `QUnit.module()` instead of `module()`
   // in case we are in a CLI environment
   QUnit.module('spotlight');
 
@@ -345,5 +345,10 @@
       skipTest(1);
     }
   });
+
+  /*--------------------------------------------------------------------------*/
+
+  // explicitly call `QUnit.start()` for Narwhal, Rhino, and RingoJS
+  QUnit.start();
 
 }(typeof global == 'object' && global || this));
