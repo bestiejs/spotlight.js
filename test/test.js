@@ -44,7 +44,7 @@
 
   /**
    * Skips a given number of tests with a passing result.
-   * 
+   *
    * @private
    * @param {Number} count The number of tests to skip.
    */
@@ -346,10 +346,4 @@
     }
   });
 
-  /*--------------------------------------------------------------------------*/
-
-  // explicitly call `QUnit.start()` in a CLI environment
-  if (!window.document) {
-    QUnit.start();
-  }
 }(typeof global == 'object' && global || this));
