@@ -29,9 +29,6 @@
 
 <!-- div -->
 
-
-<!-- div -->
-
 ### <a id="spotlight"></a>`spotlight`
 <a href="#spotlight">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L681 "View in source") [&#x24C9;][1]
 
@@ -40,9 +37,6 @@
 * * *
 
 <!-- /div -->
-
-
-<!-- div -->
 
 
 <!-- div -->
@@ -59,9 +53,6 @@
 
 <!-- div -->
 
-
-<!-- div -->
-
 ### <a id="spotlightversion"></a>`spotlight.version`
 <a href="#spotlightversion">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L698 "View in source") [&#x24C9;][1]
 
@@ -70,9 +61,6 @@
 * * *
 
 <!-- /div -->
-
-
-<!-- div -->
 
 
 <!-- div -->
@@ -108,9 +96,6 @@ spotlight.byKind('constructor');
 
 <!-- div -->
 
-
-<!-- div -->
-
 ### <a id="spotlightbynamename--options"></a>`spotlight.byName(name [, options={}])`
 <a href="#spotlightbynamename--options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L631 "View in source") [&#x24C9;][1]
 
@@ -140,9 +125,6 @@ spotlight.byName('map', { 'object': jQuery, 'path': '$' });
 
 <!-- div -->
 
-
-<!-- div -->
-
 ### <a id="spotlightbyvaluevalue--options"></a>`spotlight.byValue(value [, options={}])`
 <a href="#spotlightbyvaluevalue--options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L650 "View in source") [&#x24C9;][1]
 
@@ -164,9 +146,6 @@ spotlight.byValue(0);
 * * *
 
 <!-- /div -->
-
-
-<!-- div -->
 
 
 <!-- div -->
