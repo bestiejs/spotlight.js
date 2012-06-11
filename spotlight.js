@@ -733,17 +733,20 @@
   /*--------------------------------------------------------------------------*/
 
   // expose spotlight
-  // in Narwhal, Node.js, or RingoJS
-  if (freeExports) {
+  // some AMD build optimizers, like r.js, check for specific condition patterns like the following:
+  if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
+    // define as an anonymous module so, through path mapping, it can be aliased
+    define(spotlight);
+  }
+  // check for `exports` after `define` in case a build optimizer adds an `exports` object
+  else if (freeExports) {
+    // in Narwhal, Node.js, or RingoJS
     forOwn(spotlight, function(value, key) {
       freeExports[key] = value;
     });
+
     // assign `exports` to `spotlight` so we can detect changes to the `debug` flag
     spotlight = freeExports;
-  }
-  // via an AMD loader
-  else if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
-    define('spotlight', spotlight);
   }
   // in a browser or Rhino
   else {
