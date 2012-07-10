@@ -85,25 +85,6 @@ spotlight.custom(function(value, key) { return key.indexOf('oo') > -1; });
 spotlight.custom(function(value) { return !value; });
 ~~~
 
-## Cloning this repo
-
-To clone this repository including all submodules, using Git 1.6.5 or later:
-
-~~~ bash
-git clone --recursive https://github.com/bestiejs/spotlight.js.git
-cd spotlight.js
-~~~
-
-For older Git versions, just use:
-
-~~~ bash
-git clone https://github.com/bestiejs/spotlight.js.git
-cd spotlight.js
-git submodule update --init
-~~~
-
-Feel free to fork and send pull requests if you see improvements!
-
 ## Footnotes
 
   1. Spotlight.js has been tested in at least Chrome 5/8/12/14, Firefox 1.5-4, IE 6-10, Opera 9.25-12, Safari 2-5, Node.js 0.4.2, Narwhal 0.3.2, Ringo 0.7, and Rhino 1.7RC3.
