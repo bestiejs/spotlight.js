@@ -1,4 +1,5 @@
-(function(window, undefined) {
+;(function(window, undefined) {
+  'use strict';
 
   /** Use a single load function */
   var load = typeof require == 'function' ? require : window.load;
@@ -52,9 +53,10 @@
    * Skips a given number of tests with a passing result.
    *
    * @private
-   * @param {Number} count The number of tests to skip.
+   * @param {Number} [count=1] The number of tests to skip.
    */
   function skipTest(count) {
+    count || (count = 1);
     while (count--) {
       ok(true, 'test skipped');
     }
@@ -348,7 +350,7 @@
     if (window.document && window.require) {
       strictEqual((spotlight2 || {}).debug, false, 'require("spotlight")');
     } else {
-      skipTest(1);
+      skipTest();
     }
   });
 
