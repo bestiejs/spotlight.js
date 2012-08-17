@@ -16,31 +16,31 @@ For a list of upcoming features, check out our [roadmap](https://github.com/best
 
 In a browser:
 
-~~~ html
+```html
 <script src="spotlight.js"></script>
-~~~
+```
 
 Via [npm](http://npmjs.org/):
 
-~~~ bash
+```bash
 npm install spotlight
-~~~
+```
 
 In [Node.js](http://nodejs.org/) and [RingoJS](http://ringojs.org/):
 
-~~~ js
+```js
 var spotlight = require('spotlight');
-~~~
+```
 
 In [Rhino](http://www.mozilla.org/rhino/):
 
-~~~ js
+```js
 load('spotlight.js');
-~~~
+```
 
 In an AMD loader like [RequireJS](http://requirejs.org/):
 
-~~~ js
+```js
 require({
   'paths': {
     'spotlight': 'path/to/spotlight'
@@ -49,11 +49,11 @@ require({
 ['spotlight'], function(spotlight) {
   spotlight.byKind('constructor');
 });
-~~~
+```
 
 Usage example:
 
-~~~ js
+```js
 // find all "length" properties
 spotlight.byName('length');
 
@@ -83,7 +83,7 @@ spotlight.custom(function(value, key) { return key.indexOf('oo') > -1; });
 
 // or all properties with falsey values
 spotlight.custom(function(value) { return !value; });
-~~~
+```
 
 ## Footnotes
 

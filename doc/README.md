@@ -5,7 +5,7 @@
 
 <!-- div -->
 
-## <a id="toc"></a>`spotlight`
+## <a id="spotlight"></a>`spotlight`
 * [`spotlight`](#spotlight)
 * [`spotlight.debug`](#spotlightdebug)
 * [`spotlight.version`](#spotlightversion)
@@ -75,7 +75,7 @@ Crawls environment objects logging all object properties whose values are of a s
 2. `[options={}]` *(Object)*: The options object.
 
 #### Example
-~~~ js
+```js
 // by constructor
 spotlight.byKind(jQuery);
 
@@ -87,7 +87,7 @@ spotlight.byKind('undefined');
 
 // or special kind "constructor"
 spotlight.byKind('constructor');
-~~~
+```
 
 * * *
 
@@ -106,7 +106,7 @@ Crawls environment objects logging all object properties of the specified name.
 2. `[options={}]` *(Object)*: The options object.
 
 #### Example
-~~~ js
+```js
 // basic
 // > window.length -> (number) 0
 spotlight.byName('length');
@@ -116,7 +116,7 @@ spotlight.byName('length');
 // > $.map -> (function) function(a,b,c){...}
 // > $.fn.map -> (function) function(a){...}
 spotlight.byName('map', { 'object': jQuery, 'path': '$' });
-~~~
+```
 
 * * *
 
@@ -135,13 +135,13 @@ Crawls environment objects logging all object properties whose values are a stri
 2. `[options={}]` *(Object)*: The options object.
 
 #### Example
-~~~ js
+```js
 // basic
 // > window.pageXOffset -> (number) 0
 // > window.screenX -> (number) 0
 // > window.length -> (number) 0
 spotlight.byValue(0);
-~~~
+```
 
 * * *
 
@@ -160,13 +160,13 @@ Crawls environment objects executing `callback`, passing the current `value`, `k
 2. `[options={}]` *(Object)*: The options object.
 
 #### Example
-~~~ js
+```js
 // filter by property names containing "oo"
 spotlight.custom(function(value, key) { return key.indexOf('oo') > -1; });
 
 // or filter by falsey values
 spotlight.custom(function(value) { return !value; });
-~~~
+```
 
 * * *
 
@@ -179,4 +179,4 @@ spotlight.custom(function(value) { return !value; });
 <!-- /div -->
 
 
-  [1]: #toc "Jump back to the TOC."
+  [1]: #spotlight "Jump back to the TOC."
