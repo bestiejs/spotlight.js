@@ -68,6 +68,15 @@
   // enable debug mode so `spotlight` methods return an array of log calls
   spotlight.debug = true;
 
+  // avoid false positives for QUnit's `noglobals` checks
+  QUnit.moduleStart(function() {
+    window.a = true;
+  });
+
+  QUnit.moduleDone(function() {
+    delete window.a;
+  });
+
   // explicitly call `QUnit.module()` instead of `module()`
   // in case we are in a CLI environment
   QUnit.module('spotlight');
