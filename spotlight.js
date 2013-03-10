@@ -739,7 +739,7 @@
     define(spotlight);
   }
   // check for `exports` after `define` in case a build optimizer adds an `exports` object
-  else if (freeExports) {
+  else if (freeExports  && !freeExports.nodeType) {
     // in Narwhal, Node.js, or RingoJS
     forOwn(spotlight, function(value, key) {
       freeExports[key] = value;
