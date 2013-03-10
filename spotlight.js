@@ -750,8 +750,6 @@
   }
   // in a browser or Rhino
   else {
-    // use square bracket notation so Closure Compiler won't munge `spotlight`
-    // http://code.google.com/closure/compiler/docs/api-tutorial3.html#export
-    window['spotlight'] = spotlight;
+    window.spotlight = spotlight;
   }
 }(this));
