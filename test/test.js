@@ -4,33 +4,32 @@
   /** Use a single "load" function */
   var load = typeof require == 'function' ? require : window.load;
 
-  /** The `platform` object to check */
-  var platform =
-    window.platform ||
-    load('../vendor/platform.js/platform.js') ||
-    window.platform;
-
   /** The unit testing framework */
-  var QUnit =
-    window.QUnit || (
-      window.addEventListener || (window.addEventListener = Function.prototype),
-      window.setTimeout || (window.setTimeout = Function.prototype),
+  var QUnit = (function() {
+    var noop = Function.prototype;
+    return  window.QUnit || (
+      window.addEventListener || (window.addEventListener = noop),
+      window.setTimeout || (window.setTimeout = noop),
       window.QUnit = load('../vendor/qunit/qunit/qunit.js') || window.QUnit,
-      load('../vendor/qunit-clib/qunit-clib.js'),
-      window.addEventListener === Function.prototype && delete window.addEventListener,
+      (load('../vendor/qunit-clib/qunit-clib.js') || { 'runInContext': noop }).runInContext(window),
+      addEventListener === noop && delete window.addEventListener,
       window.QUnit
     );
+  }());
 
   /** The `spotlight` object to test */
-  var spotlight =
-    window.spotlight ||
+  var spotlight = window.spotlight || (window.spotlight =
     load('../spotlight.js') ||
-    window.spotlight;
+    window.spotlight
+  );
 
   /** The root name for the environment */
-  var rootName =
-    typeof global == 'object' && global ? 'global' :
-      typeof environment == 'object' ? '<global object>' : 'window';
+  var rootName = (typeof global == 'object' && global)
+    ? 'global'
+    : (typeof environment == 'object' ? '<global object>' : 'window');
+
+  /** Shortcut used to convert array-like objects to arrays */
+  var slice = Array.prototype.slice;
 
   /*--------------------------------------------------------------------------*/
 
@@ -43,7 +42,7 @@
    * @returns {Array} The filtered result.
    */
   function simplify(result) {
-    result = [].slice.call(result);
+    result = slice.call(result);
     for (var i = -1, l = result.length; ++i < l; ) {
       result[i] = result[i][0];
     }
@@ -107,7 +106,6 @@
         setDescriptor = Object.defineProperty;
 
     var has = {
-
       'descriptors' : !!(function() {
         try {
           var o = {};
@@ -309,7 +307,7 @@
     deepEqual(result.slice(0, 1), expected, 'basic');
 
     spotlight.custom(function() {
-      result = [].slice.call(arguments);
+      result = slice.call(arguments);
     }, { 'object': a.b });
 
     expected = [a.b.c, 'c', a.b];
@@ -366,7 +364,8 @@
 
   /*--------------------------------------------------------------------------*/
 
-  // configure QUnit and call `QUnit.start()` for Narwhal, Node.js, PhantomJS, Rhino, and RingoJS
+  // configure QUnit and call `QUnit.start()` for
+  // Narwhal, Node.js, PhantomJS, Rhino, and RingoJS
   if (!window.document || window.phantom) {
     QUnit.config.noglobals = true;
     QUnit.start();
