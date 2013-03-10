@@ -4,7 +4,7 @@ An object crawler/property search library that works on nearly all JavaScript pl
 
 ## BestieJS
 
-Spotlight.js is part of the BestieJS *"Best in Class"* module collection. This means we promote solid browser/environment support, ES5 precedents, unit testing, and plenty of documentation.
+Spotlight.js is part of the BestieJS *"Best in Class"* module collection. This means we promote solid browser/environment support, ES5+ precedents, unit testing, and plenty of documentation.
 
 ## Documentation
 
@@ -87,7 +87,7 @@ spotlight.custom(function(value) { return !value; });
 
 ## Footnotes
 
-  1. Spotlight.js has been tested in at least Chrome 5/8/12/14, Firefox 1.5-4, IE 6-10, Opera 9.25-12, Safari 2-5, Node.js 0.4.2, Narwhal 0.3.2, Ringo 0.7, and Rhino 1.7RC3.
+  1. Spotlight.js has been tested in at least Chrome 5~25, Firefox 1~19, IE 6-10, Opera 9.25-12, Safari 3-6, Node.js 0.4.8-0.8.22, Narwhal 0.3.2, PhantomJS 1.8.1, RingoJS 0.9, and Rhino 1.7RC5.
      <a name="fn1" title="Jump back to footnote 1 in the text." href="#fnref1">&#8617;</a>
 
 ## Author
