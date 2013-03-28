@@ -3,18 +3,13 @@
   "version": "1.0.0-pre",
   "description": "An object crawler/property search library that works on nearly all JavaScript platforms.",
   "homepage": "https://github.com/bestiejs/spotlight.js",
+  "license": "MIT",
   "main": "spotlight",
   "keywords": [
     "crawl",
     "find",
     "search",
     "utility"
-  ],
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "http://mths.be/mit"
-    }
   ],
   "author": {
     "name": "John-David Dalton",
