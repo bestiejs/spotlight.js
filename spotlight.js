@@ -538,6 +538,7 @@
     var defaultCount = 2,
         console = typeof window.console == 'object' && window.console,
         document = typeof window.document == 'object' && window.document,
+        phantom = typeof window.phantom == 'object' && window.phantom,
         JSON = typeof window.JSON == 'object' && isFunction(window.JSON && window.JSON.stringify) && window.JSON;
 
     // lazy define
@@ -554,7 +555,7 @@
         }
       }
       // avoid logging if in debug mode and running from the CLI
-      if (document || !spotlight.debug) {
+      if (!spotlight.debug || (document && !phantom)) {
         // because `console.log` is a host method we don't assume `.apply()` exists
         if (argCount < 2) {
           if (JSON) {
