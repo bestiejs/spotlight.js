@@ -83,7 +83,7 @@
       try {
         var o = Iterator({ '': 1 });
         for (o in o) { }
-        return toString.call(o) == '[object Array]';
+        return getClass(o) == 'Array';
       } catch(e) { }
     }())
   };
@@ -264,6 +264,24 @@
   }
 
   /**
+   * Gets the internal `[[Class]]` of a given `value`.
+   *
+   * @private
+   * @param {Mixed} value The value to inspect.
+   * @returns {String} Returns the value's internal `[[Class]]`.
+   */
+  function getClass(value) {
+    if (value == null) {
+      return value === null ? 'Null' : 'Undefined';
+    }
+    try {
+      var result = (result = /^\[object (.*?)\]$/.exec(toString.call(value))) && result[1];
+    } catch(e) { }
+
+    return result || '';
+  }
+
+  /**
    * Mimics ES 5.1's `Object.prototype.toString` behavior by returning the
    * value's [[Class]], "Null" or "Undefined" as well as other non-spec'ed results
    * like "Constructor" and "Global" .
@@ -285,7 +303,7 @@
       // a function is assumed of kind "Constructor" if it has its own
       // enumerable prototype properties or doesn't have a [[Class]] of Object
       try {
-        if (toString.call(value.prototype) == '[object Object]') {
+        if (getClass(value.prototype) == 'Object') {
           for (var key in value.prototype) {
             result = 'Constructor';
             break;
@@ -295,7 +313,7 @@
         }
       } catch(e) { }
     }
-    return result || (toString.call(value).match(/^\[object (.*?)\]$/) || 0)[1] ||
+    return result || getClass(value) ||
       (result = typeof value, result.charAt(0).toUpperCase() + result.slice(1))
   }
 
@@ -312,24 +330,6 @@
     if (isFunction(hasOwnProperty)) {
       hasKey = function(object, key) {
         return object != null && hasOwnProperty.call(Object(object), key);
-      };
-    }
-    // or for Safari 2
-    else if ({}.__proto__ == Object.prototype) {
-      hasKey = function(object, key) {
-        var result = false;
-        if (object != null) {
-          object = Object(object);
-          object.__proto__ = [object.__proto__, object.__proto__ = null, result = key in object][0];
-        }
-        return result;
-      };
-    }
-    // or for others (not as accurate)
-    else {
-      hasKey = function(object, key) {
-        var parent = object != null && (object.constructor || Object).prototype;
-        return !!parent && key in Object(object) && !(key in parent && object[key] === parent[key]);
       };
     }
     // or for an Opera < 10.53 bug, found by Garrett Smith, that occurs with
@@ -355,7 +355,7 @@
   function isArguments() {
     // lazy define
     isArguments = function(value) {
-      return toString.call(value) == '[object Arguments]';
+      return getClass(value) == 'Arguments';
     };
     if (!isArguments(arguments)) {
       isArguments = function(value) {
@@ -373,7 +373,7 @@
    * @returns {Boolean} Returns `true` if `value` is a function, else `false`.
    */
   function isFunction(value) {
-    return toString.call(value) == '[object Function]';
+    return getClass(value) == 'Function';
   }
 
   /**
@@ -401,7 +401,7 @@
    */
   function isObject(value) {
     var ctor,
-        result = !!value && toString.call(value) == '[object Object]';
+        result = getClass(value) == 'Object';
 
     // some objects like `window.java` may kill script execution when checking
     // for their constructor, so we filter by [[Class]] first
