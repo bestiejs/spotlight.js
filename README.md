@@ -87,7 +87,7 @@ spotlight.custom(function(value) { return !value; });
 
 ## Footnotes
 
-  1. Spotlight.js has been tested in at least Chrome 5~27, Firefox 2~21, IE 6-10, Opera 9.25-12, Safari 3-6, Node.js 0.4.8-0.10.7, Narwhal 0.3.2, PhantomJS 1.9.0, RingoJS 0.9, and Rhino 1.7RC5.
+  1. Spotlight.js has been tested in at least Chrome 5~28, Firefox 2~22, IE 6-10, Opera 9.25-15, Safari 3-6, Node.js 0.4.8-0.10.13, Narwhal 0.3.2, PhantomJS 1.9.0, RingoJS 0.9, and Rhino 1.7RC5.
      <a name="fn1" title="Jump back to footnote 1 in the text." href="#fnref1">&#8617;</a>
 
 ## Author
