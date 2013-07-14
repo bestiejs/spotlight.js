@@ -10,27 +10,35 @@
 		<script src="../spotlight.js"></script>
 		<script src="../vendor/qunit/qunit/qunit.js"></script>
 		<script>
+			QUnit.urlParams.norequire = /[?&]norequire=true(?:&|$)/.test(location.search);
+
 			// load test.js if not using require.js
-			document.write(/[?&]norequire=true(?:&|$)/.test(location.search)
+			document.write(QUnit.urlParams.norequire
 				? '<script src="test.js"><\/script>'
 				: '<script src="../vendor/requirejs/require.js"><\/script>'
 			);
 		</script>
 		<script>
-			// load Spotlight as a module
 			var spotlight2;
 
-			window.require && require({
-				'baseUrl': '../vendor/requirejs/',
-				'urlArgs': 't=' + (+new Date),
-				'paths': {
-					'spotlight': '../../spotlight'
-				}
-			},
-			['spotlight'], function(spotlight) {
-				spotlight2 = spotlight;
-				require(['test.js']);
-			});
+			if (window.require) {
+				QUnit.config.autostart = false;
+
+				// load Spotlight.js as a module
+				require({
+					'baseUrl': '../vendor/requirejs/',
+					'urlArgs': 't=' + (+new Date),
+					'paths': {
+						'spotlight': '../../spotlight'
+					}
+				},
+				['spotlight'], function(spotlight) {
+					spotlight2 = spotlight;
+					require(['test.js'], function() {
+						QUnit.start();
+					});
+				});
+			}
 		</script>
 	</body>
 </html>
