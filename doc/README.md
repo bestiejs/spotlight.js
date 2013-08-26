@@ -44,7 +44,7 @@
 ### <a id="spotlightdebug"></a>`spotlight.debug`
 <a href="#spotlightdebug">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L690 "View in source") [&#x24C9;][1]
 
-*(Boolean)*: A flag to indicate that methods will execute in debug mode.
+*(boolean)*: A flag to indicate that methods will execute in debug mode.
 
 * * *
 
@@ -56,7 +56,7 @@
 ### <a id="spotlightversion"></a>`spotlight.version`
 <a href="#spotlightversion">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L699 "View in source") [&#x24C9;][1]
 
-*(String)*: The semantic version number.
+*(string)*: The semantic version number.
 
 * * *
 
@@ -65,13 +65,13 @@
 
 <!-- div -->
 
-### <a id="spotlightbykindkind--options"></a>`spotlight.byKind(kind [, options={}])`
+### <a id="spotlightbykindkind--options"></a>`spotlight.byKind(kind, [options={}])`
 <a href="#spotlightbykindkind--options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L610 "View in source") [&#x24C9;][1]
 
 Crawls environment objects logging all object properties whose values are of a specified constructor instance, [[Class]], or type.
 
 #### Arguments
-1. `kind` *(Function|String)*: The constructor, [[Class]], or type to check against.
+1. `kind` *(Function|string)*: The constructor, [[Class]], or type to check against.
 2. `[options={}]` *(Object)*: The options object.
 
 #### Example
@@ -96,13 +96,13 @@ spotlight.byKind('constructor');
 
 <!-- div -->
 
-### <a id="spotlightbynamename--options"></a>`spotlight.byName(name [, options={}])`
+### <a id="spotlightbynamename--options"></a>`spotlight.byName(name, [options={}])`
 <a href="#spotlightbynamename--options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L632 "View in source") [&#x24C9;][1]
 
 Crawls environment objects logging all object properties of the specified name.
 
 #### Arguments
-1. `name` *(String)*: The property name to search for.
+1. `name` *(string)*: The property name to search for.
 2. `[options={}]` *(Object)*: The options object.
 
 #### Example
@@ -125,13 +125,13 @@ spotlight.byName('map', { 'object': jQuery, 'path': '$' });
 
 <!-- div -->
 
-### <a id="spotlightbyvaluevalue--options"></a>`spotlight.byValue(value [, options={}])`
+### <a id="spotlightbyvaluevalue--options"></a>`spotlight.byValue(value, [options={}])`
 <a href="#spotlightbyvaluevalue--options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L651 "View in source") [&#x24C9;][1]
 
 Crawls environment objects logging all object properties whose values are a strict match for the specified value.
 
 #### Arguments
-1. `value` *(Mixed)*: The value to search for.
+1. `value` *(\*)*: The value to search for.
 2. `[options={}]` *(Object)*: The options object.
 
 #### Example
@@ -150,7 +150,7 @@ spotlight.byValue(0);
 
 <!-- div -->
 
-### <a id="spotlightcustomcallback--options"></a>`spotlight.custom(callback [, options={}])`
+### <a id="spotlightcustomcallback--options"></a>`spotlight.custom(callback, [options={}])`
 <a href="#spotlightcustomcallback--options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight/blob/master/spotlight.js#L671 "View in source") [&#x24C9;][1]
 
 Crawls environment objects executing `callback`, passing the current `value`, `key`, and `object` as arguments, against each object encountered and logs properties for which `callback` returns true.

@@ -96,7 +96,7 @@
    * @private
    * @param {Array} array The array to search.
    * @param {Function} callback A function executed per array value .
-   * @returns {Mixed} The filtered value.
+   * @returns {*} The filtered value.
    */
   function filterOne(array, callback) {
     var length = array.length;
@@ -267,8 +267,8 @@
    * Gets the internal `[[Class]]` of a given `value`.
    *
    * @private
-   * @param {Mixed} value The value to inspect.
-   * @returns {String} Returns the value's internal `[[Class]]`.
+   * @param {*} value The value to inspect.
+   * @returns {string} Returns the value's internal `[[Class]]`.
    */
   function getClass(value) {
     if (value == null) {
@@ -287,8 +287,8 @@
    * like "Constructor" and "Global" .
    *
    * @private
-   * @param {Mixed} value The value to check.
-   * @returns {String} Returns a string representing the kind of `value`.
+   * @param {*} value The value to check.
+   * @returns {string} Returns a string representing the kind of `value`.
    */
   function getKindOf(value) {
     var result;
@@ -322,8 +322,8 @@
    *
    * @private
    * @param {Object} object The object to check.
-   * @param {String} key The key to check for.
-   * @returns {Boolean} Returns `true` if key is a direct property, else `false`.
+   * @param {string} key The key to check for.
+   * @returns {boolean} Returns `true` if key is a direct property, else `false`.
    */
   function hasKey() {
     // lazy define for modern browsers
@@ -349,8 +349,8 @@
    * Checks if a value is an `arguments` object.
    *
    * @private
-   * @param {Mixed} value The value to check.
-   * @returns {Boolean} Returns `true` if the value is an `arguments` object, else `false`.
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if the value is an `arguments` object, else `false`.
    */
   function isArguments() {
     // lazy define
@@ -369,8 +369,8 @@
    * Checks if the specified `value` is a function.
    *
    * @private
-   * @param {Mixed} value The value to check.
-   * @returns {Boolean} Returns `true` if `value` is a function, else `false`.
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is a function, else `false`.
    */
   function isFunction(value) {
     return getClass(value) == 'Function';
@@ -382,9 +382,9 @@
    * types of object, function, or unknown.
    *
    * @private
-   * @param {Mixed} object The owner of the property.
-   * @param {String} property The property to check.
-   * @returns {Boolean} Returns `true` if the property value is a non-primitive, else `false`.
+   * @param {mixed} object The owner of the property.
+   * @param {string} property The property to check.
+   * @returns {boolean} Returns `true` if the property value is a non-primitive, else `false`.
    */
   function isHostType(object, property) {
     var type = object != null ? typeof object[property] : 'number';
@@ -396,8 +396,8 @@
    * Checks if the specified `value` is an Object object.
    *
    * @private
-   * @param {Mixed} value The value to check.
-   * @returns {Boolean} Returns `true` if `value` is an object, else `false`.
+   * @param {*} value The value to check.
+   * @returns {boolean} Returns `true` if `value` is an object, else `false`.
    */
   function isObject(value) {
     var ctor,
@@ -425,11 +425,11 @@
    * Performs argument type checks and calls `crawl()` with specified arguments.
    *
    * @private
-   * @param {String} name The name of the filter function passed.
-   * @param {String} expected The data type expected of the given value.
-   * @param {Mixed} value A generic argument passed to the callback.
+   * @param {string} name The name of the filter function passed.
+   * @param {string} expected The data type expected of the given value.
+   * @param {*} value A generic argument passed to the callback.
    * @param {Object} [options={}] The options object passed.
-   * @returns {Array|Null} If in debug mode return the value of the invoked function or `null` if errored.
+   * @returns {Array|null} If in debug mode return the value of the invoked function or `null` if errored.
    */
   function checkCall(name, expected, value, options) {
     var result = (!expected || RegExp('^(?:' + expected + ')$', 'i').test(getKindOf(value)))
@@ -443,8 +443,8 @@
    * Crawls environment objects logging all properties that pass the callback filter.
    *
    * @private
-   * @param {Function|String} callback A function executed per object encountered.
-   * @param {Mixed} callbackArg An argument passed to the callback.
+   * @param {Function|string} callback A function executed per object encountered.
+   * @param {*} callbackArg An argument passed to the callback.
    * @param {Object} [options={}] The options object.
    * @returns {Array} An array of arguments passed to each `console.log()` call.
    */
@@ -530,9 +530,9 @@
    * Logs a message to the console.
    *
    * @private
-   * @param {String} type The log type, either "text" or "error".
-   * @param {String} message The log message.
-   * @param {Mixed} value An additional value to log.
+   * @param {string} type The log type, either "text" or "error".
+   * @param {string} message The log message.
+   * @param {*} value An additional value to log.
    */
   function log() {
     var defaultCount = 2,
@@ -591,7 +591,7 @@
    * are of a specified constructor instance, [[Class]], or type.
    *
    * @memberOf spotlight
-   * @param {Function|String} kind The constructor, [[Class]], or type to check against.
+   * @param {Function|string} kind The constructor, [[Class]], or type to check against.
    * @param {Object} [options={}] The options object.
    * @example
    *
@@ -615,7 +615,7 @@
    * Crawls environment objects logging all object properties of the specified name.
    *
    * @memberOf spotlight
-   * @param {String} name The property name to search for.
+   * @param {string} name The property name to search for.
    * @param {Object} [options={}] The options object.
    * @example
    *
@@ -638,7 +638,7 @@
    * a strict match for the specified value.
    *
    * @memberOf spotlight
-   * @param {Mixed} value The value to search for.
+   * @param {*} value The value to search for.
    * @param {Object} [options={}] The options object.
    * @example
    *
@@ -685,7 +685,7 @@
      * A flag to indicate that methods will execute in debug mode.
      *
      * @memberOf spotlight
-     * @type Boolean
+     * @type boolean
      */
     'debug': false,
 
@@ -694,7 +694,7 @@
      *
      * @static
      * @memberOf spotlight
-     * @type String
+     * @type string
      */
     'version': '1.0.0-pre',
 
