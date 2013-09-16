@@ -5,22 +5,11 @@
   "homepage": "https://github.com/bestiejs/spotlight.js",
   "license": "MIT",
   "main": "spotlight.js",
-  "keywords": [
-    "crawl",
-    "find",
-    "search",
-    "utility"
-  ],
+  "keywords": ["crawl", "find", "search", "utility"],
   "author": "John-David Dalton <john.david.dalton@gmail.com> (http://allyoucanleet.com/)",
   "bugs": "https://github.com/bestiejs/spotlight.js/issues",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/bestiejs/spotlight.js.git"
-  },
-  "engines": [
-    "node",
-    "rhino"
-  ],
+  "repository": { "type": "git", "url": "https://github.com/bestiejs/spotlight.js.git" },
+  "engines": ["node", "rhino"],
   "files": [
     "LICENSE.txt",
     "spotlight.js"
