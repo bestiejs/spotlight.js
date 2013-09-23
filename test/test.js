@@ -11,7 +11,7 @@
       window.addEventListener || (window.addEventListener = noop),
       window.setTimeout || (window.setTimeout = noop),
       window.QUnit = load('../vendor/qunit/qunit/qunit.js') || window.QUnit,
-      (load('../vendor/qunit-clib/qunit-clib.js') || { 'runInContext': noop }).runInContext(window),
+      (load('../vendor/qunit-extras/qunit-extras.js') || { 'runInContext': noop }).runInContext(window),
       addEventListener === noop && delete window.addEventListener,
       window.QUnit
     );

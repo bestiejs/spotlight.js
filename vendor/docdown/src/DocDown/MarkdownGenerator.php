@@ -27,7 +27,6 @@ class MarkdownGenerator {
   /**
    * The HTML for the open tag.
    *
-   * @static
    * @memberOf MarkdownGenerator
    * @type string
    */
@@ -48,6 +47,15 @@ class MarkdownGenerator {
    * @type string
    */
   public $source = '';
+
+  /**
+   * The array of code snippets that are tokenized by `escape`.
+   *
+   * @private
+   * @memberOf MarkdownGenerator
+   * @type Array
+   */
+  private $snippets = array();
 
   /*--------------------------------------------------------------------------*/
 
@@ -188,14 +196,21 @@ class MarkdownGenerator {
       array_push(
         $result,
         $this->openTag,
-        MarkdownGenerator::interpolate("### <a id=\"#{hash}\"></a>`#{member}#{separator}#{call}`\n<a href=\"##{hash}\">#</a> [&#x24C8;](#{href} \"View in source\") [&#x24C9;][1]\n\n#{desc}", $entry)
+        MarkdownGenerator::interpolate("### <a id=\"#{hash}\"></a>`#{member}#{separator}#{call}`\n<a href=\"##{hash}\">#</a> [&#x24C8;](#{href} \"View in source\") [&#x24C9;][1]\n\n#{desc}", array(
+          'call' => $entry->getCall(),
+          'desc' => $this->escape($entry->getDesc()),
+          'hash' => $entry->hash,
+          'href' => $entry->href,
+          'member' => $entry->member,
+          'separator' => $entry->separator
+        ))
       );
 
       // @alias
       if (count($aliases = $entry->getAliases())) {
         array_push($result, '', '#### Aliases');
         foreach ($aliases as $index => $alias) {
-          $aliases[$index] = $alias->getName();
+          $aliases[$index] = MarkdownGenerator::interpolate('#{member}#{separator}#{name}', $alias);
         }
         $result[] = '*' . implode(', ', $aliases) . '*';
       }
@@ -204,10 +219,10 @@ class MarkdownGenerator {
         array_push($result, '', '#### Arguments');
         foreach ($params as $index => $param) {
           $result[] = MarkdownGenerator::interpolate('#{num}. `#{name}` (#{type}): #{desc}', array(
-            'desc' => $param[2],
+            'desc' => $this->escape($param[2]),
             'name' => $param[1],
             'num'  => $index + 1,
-            'type' => preg_replace('/(?<!\\\)(\*)/', '\\\$1', $param[0])
+            'type' => $this->escape($param[0])
           ));
         }
       }
@@ -217,8 +232,8 @@ class MarkdownGenerator {
           $result, '',
           '#### Returns',
           MarkdownGenerator::interpolate('(#{type}): #{desc}', array(
-            'desc' => $returns[1],
-            'type' => preg_replace('/(?<!\\\)(\*)/', '\\\$1', $returns[0])
+            'desc' => $this->escape($returns[1]),
+            'type' => $this->escape($returns[0])
           ))
         );
       }
@@ -228,6 +243,23 @@ class MarkdownGenerator {
       }
       array_push($result, "\n* * *", $this->closeTag);
     }
+  }
+
+  /**
+   * Escapes special Markdown characters.
+   *
+   * @private
+   * @memberOf Entry
+   * @param {string} $string The string to escape.
+   * @returns {string} Returns the escaped string.
+   */
+  private function escape( $string ) {
+    $string = preg_replace_callback('/`.*?\`/', array($this, 'swapSnippetsToTokens'), $string);
+    $string = preg_replace('/(?<!\\\)\*/', '&#42;', $string);
+    $string = preg_replace('/(?<!\\\)\[/', '&#91;', $string);
+    $string = preg_replace('/(?<!\\\)\]/', '&#93;', $string);
+    $string = preg_replace_callback('/@@token@@/', array($this, 'swapTokensToSnippets'), $string);
+    return $string;
   }
 
   /**
@@ -246,7 +278,7 @@ class MarkdownGenerator {
     $result = ($member ? $member . ($entry->isPlugin() ? 'prototype' : '') : '') . $entry->getCall();
     $result = preg_replace('/\(\[|\[\]/', '', $result);
     $result = preg_replace('/[\t =|\'"{}.()\]]/', '', $result);
-    $result = preg_replace('/[[#,]/', '-', $result);
+    $result = preg_replace('/[\[#,]+/', '-', $result);
     return strtolower($result);
   }
 
@@ -274,6 +306,32 @@ class MarkdownGenerator {
   private function getSeparator( $entry ) {
     $entry = is_numeric($entry) ? $this->entries($entry) : $entry;
     return $entry->isPlugin() ? '.prototype.' : '.';
+  }
+
+  /**
+   * Swaps code snippets with tokens as a `preg_replace_callback` callback
+   * used by `escape`.
+   *
+   * @private
+   * @memberOf Entry
+   * @param {Array} $matches The array of regexp matches.
+   * @returns {string} Returns the token.
+   */
+  private function swapSnippetsToTokens( $matches ) {
+    $this->snippets[] = $matches[0];
+    return '@@token@@';
+  }
+
+  /**
+   * Swaps tokens with code snippets as a `preg_replace_callback` callback
+   * used by `escape`.
+   *
+   * @private
+   * @memberOf Entry
+   * @returns {string} Returns the code snippet.
+   */
+  private function swapTokensToSnippets() {
+    return array_shift($this->snippets);
   }
 
   /*--------------------------------------------------------------------------*/
@@ -347,9 +405,10 @@ class MarkdownGenerator {
     foreach ($api as $entry) {
       $entry->hash = $this->getHash($entry);
       $entry->href = $this->getLineUrl($entry);
+      $entry->separator = '';
 
       $member = $entry->getMembers(0);
-      $member = ($member ? $member . ($entry->isPlugin() ? '.prototype.' : '.') : '') . $entry->getName();
+      $member = ($member ? $member . $this->getSeparator($entry) : '') . $entry->getName();
       $entry->member = preg_replace('/' . $entry->getName() . '$/', '', $member);
 
       // add properties to static and plugin sub-entries
@@ -448,7 +507,7 @@ class MarkdownGenerator {
         }
         // assign TOC hash
         if (count($result) == 2) {
-          $toc = $category;
+          $toc = strtolower($category);
         }
         // add category
         array_push(
@@ -457,7 +516,18 @@ class MarkdownGenerator {
         );
         // add entries
         foreach ($entries as $entry) {
-          $result[] = MarkdownGenerator::interpolate('* [`#{member}#{separator}#{name}`](##{hash})', $entry);
+          if ($entry->isAlias()) {
+            $result[] = MarkdownGenerator::interpolate('* <a href="##{hash}" class="alias">`#{member}#{separator}#{name}` -> `#{realName}`</a>', array(
+              'hash'      => $entry->hash,
+              'member'    => $entry->member,
+              'name'      => $entry->getName(),
+              'realName'  => $entry->owner->getName(),
+              'separator' => $entry->separator
+            ));
+          }
+          else {
+            $result[] = MarkdownGenerator::interpolate('* <a href="##{hash}">`#{member}#{separator}#{name}`</a>', $entry);
+          }
         }
       }
     }
@@ -494,7 +564,18 @@ class MarkdownGenerator {
           }
           foreach ($entry->{$kind} as $subentry) {
             $subentry->member = $member;
-            $result[] = MarkdownGenerator::interpolate('* [`#{member}#{separator}#{name}`](##{hash})', $subentry);
+            if ($subentry->isAlias()) {
+              $result[] = MarkdownGenerator::interpolate('* <a href="##{hash}" class="alias">`#{member}#{separator}#{name}` -> `#{realName}`</a>', array(
+                'hash'      => $subentry->hash,
+                'member'    => $subentry->member,
+                'name'      => $subentry->getName(),
+                'realName'  => $subentry->owner->getName(),
+                'separator' => $subentry->separator
+              ));
+            }
+            else {
+              $result[] = MarkdownGenerator::interpolate('* <a href="##{hash}">`#{member}#{separator}#{name}`</a>', $subentry);
+            }
           }
         }
       }
