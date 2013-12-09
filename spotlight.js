@@ -5,38 +5,62 @@
  * Copyright 2011-2013 Angus Croll <http://javascriptweblog.wordpress.com/>
  * Both available under MIT license <http://mths.be/mit>
  */
-;(function(window, undefined) {
+;(function(root, undefined) {
   'use strict';
 
-  /** Backup possible window/global object */
-  var oldWin = window;
+  /** Backup possible global object */
+  var oldRoot = root;
 
-  /* Used as the starting point(s) for the object crawler */
-  var defaultRoots = [{ 'object': window, 'path': 'window' }];
+  /** Used as the starting point(s) for the object crawler */
+  var defaultRoots = [{ 'object': root, 'path': 'window' }];
+
+  /** Detect free variable `define` */
+  var freeDefine = typeof define == 'function' &&
+    typeof define.amd == 'object' && define.amd && define;
 
   /** Detect free variable `exports` */
   var freeExports = typeof exports == 'object' && exports;
 
-  /** Detect free variable `global` */
-  var freeGlobal = typeof global == 'object' && global &&
-    (global == global.global ? (window = global) : global);
+  /** Detect free variable `module` */
+  var freeModule = typeof module == 'object' && module && module.exports == freeExports && module;
 
-  /** Used to crawl all properties regardless of enumerability */
-  var getAllKeys = Object.getOwnPropertyNames;
+  /** Detect free variable `require` */
+  var freeRequire = typeof require == 'function' && require;
 
-  /** Used to get __iterator__ descriptors */
-  var getDescriptor = Object.getOwnPropertyDescriptor;
-
-  /** Used in case an object doesn't have its own method */
-  var hasOwnProperty = {}.hasOwnProperty;
-
-  /** Used to set __iterator__ descriptors */
-  var setDescriptor = Object.defineProperty;
+  /** Detect free variable `global`, from Node.js or Browserified code, and use it as `root` */
+  var freeGlobal = typeof global == 'object' && global;
+  if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
+    root = freeGlobal;
+  }
 
   /** Used to resolve a value's internal [[Class]] */
   var toString = {}.toString;
 
-  /** Filter functions used by `crawl()` */
+  /** Used to detect if a method is native */
+  var reNative = RegExp('^' +
+    String(toString)
+      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      .replace(/toString| for [^\]]+/g, '.*?') + '$'
+  );
+
+  /** Used to determine if values are of the language type Object */
+  var objectTypes = {
+    'boolean': false,
+    'function': true,
+    'object': true,
+    'number': false,
+    'string': false,
+    'undefined': false
+  };
+
+  /** Get Lo-Dash reference */
+  var _ = root && root._ || req('lodash');
+
+  /** Used to get and set __iterator__ descriptors */
+  var getDescriptor = isNative(getDescriptor = Object.getOwnPropertyDescriptor) && getDescriptor,
+      setDescriptor = isNative(setDescriptor = Object.defineProperty) && setDescriptor;
+
+  /** Filter functions used by `crawl` */
   var filters = {
     'custom': function(value, key, object) {
       // the `this` binding is set by `crawl()`
@@ -44,7 +68,7 @@
     },
     'kind': function(value, key, object) {
       var kind = [value, value = object[key]][0];
-      return kind == '*' || (isFunction(kind)
+      return kind == '*' || (_.isFunction(kind)
         ? value instanceof kind
         : typeof value == kind || getKindOf(value).toLowerCase() == kind.toLowerCase()
       );
@@ -57,55 +81,34 @@
     }
   };
 
-  /** Used to flag features */
-  var has = {
+  /** Used to flag environments features */
+  var support = {
 
-    /** Detect ES5+ property descriptor API */
-    'descriptors' : !!(function() {
+    /** Detect ES5 property descriptor API */
+    'descriptors' : (function() {
+      // IE 8 only accepts DOM elements
       try {
         var o = {};
-        return (setDescriptor(o, o, o), 'value' in getDescriptor(o, o));
-      } catch(e) { }
-    }()),
-
-    /** Detect ES5+ Object.getOwnPropertyNames() */
-    'getAllKeys': !!(function() {
-      try {
-        return /\bvalueOf\b/.test(getAllKeys(Object.prototype));
-      } catch(e) { }
+        setDescriptor(o, o, o);
+        var result = 'value' in getDescriptor(o, o);
+      } catch(e) { };
+      return !!result;
     }()),
 
     /**
      * Detect JavaScript 1.7 iterators
      * https://developer.mozilla.org/en/new_in_javascript_1.7#Iterators
      */
-    'iterators': !!(function() {
+    'iterators': (function() {
       try {
         var o = Iterator({ '': 1 });
         for (o in o) { }
-        return getClass(o) == 'Array';
       } catch(e) { }
+      return _.isArray(o);
     }())
   };
 
   /*--------------------------------------------------------------------------*/
-
-  /**
-   * Returns the first array value for which `callback` returns true.
-   *
-   * @private
-   * @param {Array} array The array to search.
-   * @param {Function} callback A function executed per array value .
-   * @returns {*} The filtered value.
-   */
-  function filterOne(array, callback) {
-    var length = array.length;
-    while (length--) {
-      if (callback(array[length])) {
-        return array[length];
-      }
-    }
-  }
 
   /**
    * Iterates over an object's own properties, executing the `callback` for each.
@@ -115,152 +118,61 @@
    * @param {Object} object The object to iterate over.
    * @param {Function} callback A function executed per own property.
    */
-  function forOwn() {
-    var forShadowed,
-        skipSeen,
-        forArgs = true,
-        shadowed = ['constructor', 'hasOwnProperty', 'isPrototypeOf', 'propertyIsEnumerable', 'toLocaleString', 'toString', 'valueOf'];
+  function forOwn(object, callback) {
+    object = Object(object);
 
-    (function(enumFlag, key) {
-      // must use a non-native constructor to catch the Safari 2 issue
-      function Klass() { this.valueOf = 0; };
-      Klass.prototype.valueOf = 0;
-      // check various for-in bugs
-      for (key in new Klass) {
-        enumFlag += key == 'valueOf' ? 1 : 0;
-      }
-      // check if `arguments` objects have non-enumerable indexes
-      for (key in arguments) {
-        key == '0' && (forArgs = false);
-      }
-      // Safari 2 iterates over shadowed properties twice
-      // http://replay.waybackmachine.org/20090428222941/http://tobielangel.com/2007/1/29/for-in-loop-broken-in-safari/
-      skipSeen = enumFlag == 2;
-      // IE < 9 incorrectly makes an object's properties non-enumerable if they have
-      // the same name as other non-enumerable properties in its prototype chain.
-      forShadowed = !enumFlag;
-    }(0));
+    try {
+      // avoid problems with iterators
+      // https://github.com/ringo/ringojs/issues/157
+      if (support.iterators && _.isFunction(object.__iterator__)) {
+        var iterator = support.descriptors
+          ? getDescriptor(object, '__iterator__')
+          : object.__iterator__;
 
-    // lazy define
-    forOwn = function(object, callback) {
-      var ctor,
-          iterator,
-          key,
-          length,
-          skipCtor,
-          value,
-          done = !object,
-          index = -1,
-          keys = [],
-          seen = {},
-          skipProto = isFunction(object);
+        object.__iterator__ = null;
+        delete object.__iterator__;
 
-      object = Object(object);
-
-      // if possible search all properties
-      if (has.getAllKeys) {
-        try {
-          keys = getAllKeys(object);
-        } catch(e) { }
-
-        if ((length = keys.length)) {
-          while (++index < length) {
-            key = keys[index];
-            try {
-              value = object[key];
-            } catch(e) {
-              continue;
-            }
-            if (callback(value, key, object) === false) {
-              break;
-            }
-          }
-          return;
+        if (object.__iterator__) {
+          throw 1;
+        }
+        object = new Iterator(object);
+        if (support.descriptors) {
+          setDescriptor(object, '__iterator__', iterator);
+        } else {
+          object.__iterator__ = iterator;
         }
       }
-      // else search only enumerable properties
-      try {
-        // avoid problems with iterators
-        // https://github.com/ringo/ringojs/issues/157
-        if (has.iterators && isFunction(object.__iterator__)) {
-          iterator = has.descriptors
-            ? getDescriptor(object, '__iterator__')
-            : object.__iterator__;
-
-          object.__iterator__ = null;
-          delete object.__iterator__;
-          if (object.__iterator__) {
-            throw 1;
-          }
-          object = [new Iterator(object), has.descriptors
-            ? setDescriptor(object, '__iterator__', iterator)
-            : object.__iterator__ = iterator
-          ][0];
-        }
-        // some objects like Firefox 3's `XPCSafeJSObjectWrapper.prototype` may
-        // throw errors when attempting to iterate over them
-        else {
-          for (key in object) {
-            break;
-          }
-        }
-      } catch(e) {
-        return;
-      }
-
-      for (key in object) {
-        // iterators will assign an array to `key`
-        if (iterator) {
-          value = key[1];
-          key = key[0];
-        }
-        else {
-          // some properties like Firefox's `console.constructor` or IE's
-          // `element.offsetParent` may throw errors when accessed
-          try {
-            value = object[key];
-          } catch(e) {
-            continue;
-          }
-        }
-        // Firefox < 3.6, Opera > 9.50 - Opera < 11.60, and Safari < 5.1
-        // (if the prototype or a property on the prototype has been set)
-        // incorrectly set a function's `prototype` property [[Enumerable]] value
-        // to true. Because of this we standardize on skipping the the `prototype`
-        // property of functions regardless of their [[Enumerable]] value.
-        if (done =
-            !(skipProto && key == 'prototype') &&
-            !(skipSeen && (hasKey(seen, key) || !(seen[key] = true))) &&
-            (iterator || hasKey(object, key)) &&
-            callback(value, key, object) === false) {
+      // some objects like Firefox 3's `XPCSafeJSObjectWrapper.prototype` may
+      // throw errors when attempting to iterate over them
+      else {
+        for (var key in object) {
           break;
         }
       }
-      if (!done && forArgs && isArguments(object)) {
-        for (index = 0, length = object.length; index < length; index++) {
-          if (done =
-              callback(object[index], String(index), object) === false) {
-            break;
-          }
-        }
+    } catch(e) {
+      return;
+    }
+    var index = -1,
+        props = _.keys(object),
+        length = props.length;
+
+    while (++index < length) {
+      var key = props[index];
+
+      // iterators will assign an array to `key`
+      if (iterator) {
+        var value = key[1];
+        key = key[0];
       }
-      if (!done && forShadowed) {
-        // Because IE < 9 can't set the `[[Enumerable]]` attribute of an existing
-        // property and the `constructor` property of a prototype defaults to
-        // non-enumerable, we manually skip the `constructor` property when we
-        // think we are iterating over a `prototype` object.
-        ctor = object.constructor;
-        skipCtor = ctor && ctor.prototype && ctor.prototype.constructor === ctor;
-        for (index = 0; key = shadowed[index]; index++) {
-          if (!(skipCtor && key == 'constructor') &&
-              hasKey(object, key) &&
-              callback(object[key], key, object) === false) {
-            break;
-          }
-        }
+      // some properties like Firefox's `console.constructor` or IE's
+      // `element.offsetParent` may throw errors when accessed
+      try {
+        value = object[key];
+      } catch(e) {
+        continue;
       }
-    };
-    forOwn.apply(null, arguments);
+      callback(value, key, object);
+    }
   }
 
   /**
@@ -296,10 +208,10 @@
     if (value == null) {
       result = value === null ? 'Null' : 'Undefined';
     }
-    else if (value == window) {
+    else if (value == root) {
       result = 'Global';
     }
-    else if (isFunction(value) && isHostType(value, 'prototype')) {
+    else if (_.isFunction(value) && isHostType(value, 'prototype')) {
       // a function is assumed of kind "Constructor" if it has its own
       // enumerable prototype properties or doesn't have a [[Class]] of Object
       try {
@@ -318,65 +230,6 @@
   }
 
   /**
-   * Checks if an object has the specified key as a direct property.
-   *
-   * @private
-   * @param {Object} object The object to check.
-   * @param {string} key The key to check for.
-   * @returns {boolean} Returns `true` if key is a direct property, else `false`.
-   */
-  function hasKey() {
-    // lazy define for modern browsers
-    if (isFunction(hasOwnProperty)) {
-      hasKey = function(object, key) {
-        return object != null && hasOwnProperty.call(Object(object), key);
-      };
-    }
-    // or for an Opera < 10.53 bug, found by Garrett Smith, that occurs with
-    // window objects and not the global `this`
-    if (window.window == window && !hasKey(window.window, 'Object')) {
-      var __hasKey = hasKey;
-      hasKey = function(object, key) {
-        return object == window
-          ? key in object && object[key] !== {}[key]
-          : __hasKey(object, key);
-      };
-    }
-    return hasKey.apply(null, arguments);
-  }
-
-  /**
-   * Checks if a value is an `arguments` object.
-   *
-   * @private
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if the value is an `arguments` object, else `false`.
-   */
-  function isArguments() {
-    // lazy define
-    isArguments = function(value) {
-      return getClass(value) == 'Arguments';
-    };
-    if (!isArguments(arguments)) {
-      isArguments = function(value) {
-        return !!value && hasKey(value, 'callee');
-      };
-    }
-    return isArguments(arguments[0]);
-  }
-
-  /**
-   * Checks if the specified `value` is a function.
-   *
-   * @private
-   * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is a function, else `false`.
-   */
-  function isFunction(value) {
-    return getClass(value) == 'Function';
-  }
-
-  /**
    * Host objects can return type values that are different from their actual
    * data type. The objects we are concerned with usually return non-primitive
    * types of object, function, or unknown.
@@ -388,35 +241,32 @@
    */
   function isHostType(object, property) {
     var type = object != null ? typeof object[property] : 'number';
-    return !/^(?:boolean|number|string|undefined)$/.test(type) &&
-      (type == 'object' ? !!object[property] : true);
+    return objectTypes[type] && (type == 'object' ? !!object[property] : true);
   }
 
   /**
-   * Checks if the specified `value` is an Object object.
+   * Checks if `value` is a native function.
    *
    * @private
    * @param {*} value The value to check.
-   * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+   * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
    */
-  function isObject(value) {
-    var ctor,
-        result = getClass(value) == 'Object';
+  function isNative(value) {
+    return typeof value == 'function' && reNative.test(value);
+  }
 
-    // some objects like `window.java` may kill script execution when checking
-    // for their constructor, so we filter by [[Class]] first
-    if (result) {
-      // IE < 9 presents nodes like Object objects:
-      // IE < 8 are missing the node's constructor property
-      // IE 8 node constructors are typeof "object"
-      try {
-        // some properties throw errors when accessed
-        ctor = value.constructor;
-      } catch(e) { }
-      // check if the constructor is `Object` as `Object instanceof Object` is `true`
-      result = isFunction(ctor) && ctor instanceof ctor;
-    }
-    return result;
+  /**
+   * A wrapper around require() to suppress `module missing` errors.
+   *
+   * @private
+   * @param {string} id The module id.
+   * @returns {*} The exported module or `null`.
+   */
+  function req(id) {
+    try {
+      var result = freeExports && freeRequire(id);
+    } catch(e) { }
+    return result || null;
   }
 
   /*--------------------------------------------------------------------------*/
@@ -466,7 +316,7 @@
     // resolve undefined path
     if (path == null) {
       path = (
-        filterOne(roots, function(data) {
+        _.find(roots, function(data) {
           return object == data.object;
         }) ||
         { 'path': '<object>' }
@@ -493,13 +343,13 @@
 
         forOwn(object, function(value, key) {
           // inspect objects
-          if (isObject(value)) {
+          if (_.isPlainObject(value)) {
             // clone current pool per prop on the current `object` to avoid
             // sibling properties from polluting each others object pools
             pool = data.pool.slice();
 
             // check if already pooled (prevents infinite loops when handling circular references)
-            pooled = filterOne(pool, function(data) {
+            pooled = _.find(pool, function(data) {
               return value == data.object;
             });
             // add to the "call" queue
@@ -536,10 +386,10 @@
    */
   function log() {
     var defaultCount = 2,
-        console = typeof window.console == 'object' && window.console,
-        document = typeof window.document == 'object' && window.document,
-        phantom = typeof window.phantom == 'object' && window.phantom,
-        JSON = typeof window.JSON == 'object' && isFunction(window.JSON && window.JSON.stringify) && window.JSON;
+        console = typeof root.console == 'object' && root.console,
+        document = typeof root.document == 'object' && root.document,
+        phantom = typeof root.phantom == 'object' && root.phantom,
+        JSON = typeof root.JSON == 'object' && _.isFunction(root.JSON && root.JSON.stringify) && root.JSON;
 
     // lazy define
     log = function(type, message, value) {
@@ -570,7 +420,7 @@
     };
 
     // for Narwhal, Rhino, or RingoJS
-    if (!console && !document && isFunction(window.print)) {
+    if (!console && !document && _.isFunction(root.print)) {
       console = { 'log': print };
     }
     // use noop for no log support
@@ -718,23 +568,23 @@
   if (freeExports && freeGlobal) {
     defaultRoots = [{ 'object': freeGlobal, 'path': 'global' }];
     // for the Narwhal REPL
-    if (oldWin != freeGlobal) {
-      defaultRoots.unshift({ 'object': oldWin, 'path': '<module scope>' });
+    if (oldRoot != freeGlobal) {
+      defaultRoots.unshift({ 'object': oldRoot, 'path': '<module scope>' });
     }
     // avoid explicitly crawling exports if it's crawled indirectly
-    if (!(has.getAllKeys && (freeGlobal.exports == freeExports || oldWin.exports == freeExports))) {
+    if (!(freeGlobal.exports == freeExports || oldRoot.exports == freeExports)) {
       defaultRoots.unshift({ 'object': freeExports, 'path': 'exports' });
     }
   }
   // for Rhino
-  else if (getKindOf(window.environment) == 'Environment') {
+  else if (getKindOf(root.environment) == 'Environment') {
     defaultRoots[0].path = '<global object>';
   }
 
   /*--------------------------------------------------------------------------*/
 
   // expose spotlight
-  // some AMD build optimizers, like r.js, check for specific condition patterns like the following:
+  // some AMD build optimizers like r.js check for condition patterns like the following:
   if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
     // define as an anonymous module so, through path mapping, it can be aliased
     define(spotlight);
@@ -749,8 +599,8 @@
     // assign `exports` to `spotlight` so we can detect changes to the `debug` flag
     spotlight = freeExports;
   }
-  // in a browser or Rhino
   else {
-    window.spotlight = spotlight;
+    // in a browser or Rhino
+    root.spotlight = spotlight;
   }
 }(this));

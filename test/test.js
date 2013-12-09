@@ -1,26 +1,33 @@
-;(function(window, undefined) {
+;(function(root, undefined) {
   'use strict';
 
   /** Use a single "load" function */
-  var load = typeof require == 'function' ? require : window.load;
+  var load = typeof require == 'function' ? require : root.load;
 
   /** The unit testing framework */
   var QUnit = (function() {
     var noop = Function.prototype;
-    return  window.QUnit || (
-      window.addEventListener || (window.addEventListener = noop),
-      window.setTimeout || (window.setTimeout = noop),
-      window.QUnit = load('../vendor/qunit/qunit/qunit.js') || window.QUnit,
-      (load('../vendor/qunit-extras/qunit-extras.js') || { 'runInContext': noop }).runInContext(window),
-      addEventListener === noop && delete window.addEventListener,
-      window.QUnit
+    return  root.QUnit || (
+      root.addEventListener || (root.addEventListener = noop),
+      root.setTimeout || (root.setTimeout = noop),
+      root.QUnit = load('../vendor/qunit/qunit/qunit.js') || root.QUnit,
+      (load('../vendor/qunit-extras/qunit-extras.js') || { 'runInContext': noop }).runInContext(root),
+      addEventListener === noop && delete root.addEventListener,
+      root.QUnit
     );
   }());
 
+  /** The `lodash` utility function */
+  var _ = root._ || (root._ = (
+    _ = load('../vendor/lodash/dist/lodash.compat.js') || root._,
+    _ = _._ || _,
+    _.runInContext(root)
+  ));
+
   /** The `spotlight` object to test */
-  var spotlight = window.spotlight || (window.spotlight =
+  var spotlight = root.spotlight || (root.spotlight =
     load('../spotlight.js') ||
-    window.spotlight
+    root.spotlight
   );
 
   /** The root name for the environment */
@@ -69,11 +76,11 @@
 
   // avoid false positives for QUnit's `noglobals` checks
   QUnit.moduleStart(function() {
-    window.a = true;
+    root.a = true;
   });
 
   QUnit.moduleDone(function() {
-    delete window.a;
+    delete root.a;
   });
 
   // explicitly call `QUnit.module()` instead of `module()`
@@ -81,7 +88,7 @@
   QUnit.module('spotlight');
 
   test('method options', function() {
-    window.a = { 'a': { 'a': { 'b': { 'c': 12 } } } };
+    root.a = { 'a': { 'a': { 'b': { 'c': 12 } } } };
 
     var result = simplify(spotlight.byName('a', { 'object': a.a, 'path': '<path>' }));
     var expected = ['<path>.a -> (object)'];
@@ -126,7 +133,7 @@
     if (has.iterators && !Object.getOwnPropertyNames) {
       skipped = 4;
 
-      window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
+      root.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
       a.b.next = a.b.__iterator__ = function() { };
 
       result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
@@ -135,13 +142,13 @@
       if (has.descriptors) {
         skipped = 0;
 
-        window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
+        root.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
         setDescriptor(a.b, '__iterator__', { 'writable': true, 'value': noop });
 
         result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
         deepEqual(result, ['a.b.y -> (number)'], 'non-configurable __iterator__');
 
-        window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
+        root.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
         setDescriptor(a.b, '__iterator__', { 'configurable': true, 'value': noop });
 
         result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
@@ -153,7 +160,7 @@
           'value': noop
         }, 'unchanged descriptor');
 
-        window.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
+        root.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
         setDescriptor(a.b, '__iterator__', { 'value': noop });
 
         result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
@@ -167,13 +174,13 @@
 
   test('spotlight.byKind', function() {
     function Klass() { }
-    window.a = { 'b': { 'c': new Klass } };
+    root.a = { 'b': { 'c': new Klass } };
 
     var result = simplify(spotlight.byKind(Klass));
     var expected = [rootName + '.a.b.c -> (object)'];
     deepEqual(result.slice(0, 1), expected, 'Klass instance');
 
-    window.a = { 'b': { 'c': [] } };
+    root.a = { 'b': { 'c': [] } };
 
     result = simplify(spotlight.byKind('Array', { 'object': a }));
     expected = ['<object>.b.c -> (array)'];
@@ -190,13 +197,13 @@
     result = simplify(spotlight.byKind('Object', { 'object': a.b }));
     deepEqual(result, [], 'no-match [[Class]]');
 
-    window.a = { 'b': { 'c': null } };
+    root.a = { 'b': { 'c': null } };
 
     result = simplify(spotlight.byKind('null', { 'object': a }));
     expected = ['<object>.b.c -> (null)'];
     deepEqual(result, expected, 'null');
 
-    window.a = { 'b': { 'c': undefined } };
+    root.a = { 'b': { 'c': undefined } };
 
     result = simplify(spotlight.byKind('undefined', { 'object': a }));
     expected = ['<object>.b.c -> (undefined)'];
@@ -209,19 +216,19 @@
  /*--------------------------------------------------------------------------*/
 
   test('spotlight.byName', function() {
-    window.a = { 'b': { 'c': 12 } };
+    root.a = { 'b': { 'c': 12 } };
 
     var result = simplify(spotlight.byName('c'));
     var expected = [rootName + '.a.b.c -> (number)'];
     deepEqual(result.slice(0, 1), expected, 'basic');
 
-    window.a = { 'a': { 'a': { 'b': { 'c': 12 } } } };
+    root.a = { 'a': { 'a': { 'b': { 'c': 12 } } } };
 
     result = simplify(spotlight.byName('c'));
     expected = [rootName + '.a.a.a.b.c -> (number)'];
     deepEqual(result.slice(0, 1), expected, 'repeated property names');
 
-    window.a = { 'foo': { 'b': { 'foo': { 'c': { 'foo': 12 } } } } };
+    root.a = { 'foo': { 'b': { 'foo': { 'c': { 'foo': 12 } } } } };
 
     result = simplify(spotlight.byName('foo'));
     expected = [
@@ -232,7 +239,7 @@
 
     deepEqual(result.slice(0, 3), expected, 'multiple matches');
 
-    window.a = {
+    root.a = {
       'foo': { 'b': { 'foo': { 'c': { } } } },
       'bar': { }
     };
@@ -279,13 +286,13 @@
 
   test('spotlight.byValue', function() {
     var value = new String('special');
-    window.a = { 'b': { 'c': value } };
+    root.a = { 'b': { 'c': value } };
 
     var result = simplify(spotlight.byValue(value));
     var expected = [rootName + '.a.b.c -> (string)'];
     deepEqual(result.slice(0, 1), expected, 'basic');
 
-    window.a = { 'b': { 'c': 12 } };
+    root.a = { 'b': { 'c': 12 } };
 
     result = simplify(spotlight.byValue('12'));
     deepEqual(result, [], 'strict match');
@@ -295,7 +302,7 @@
 
   test('spotlight.custom', function() {
     var now = String(+new Date);
-    window.a = { 'b': { 'c': +now } };
+    root.a = { 'b': { 'c': +now } };
 
     var result = simplify(spotlight.custom(function(value, key) {
       // avoid problems with `window.java` and `window.netscape` objects
@@ -320,21 +327,21 @@
   /*--------------------------------------------------------------------------*/
 
   test('for..in', function() {
-    window.a = { 'b': { 'valueOf': function() { } } };
+    root.a = { 'b': { 'valueOf': function() { } } };
 
     var result = simplify(spotlight.byName('valueOf', { 'object': a }));
     var expected = ['<object>.b.valueOf -> (function)'];
     deepEqual(result, expected, 'shadowed property');
 
-    window.a = { 'b': { 'toString': function() { } } };
+    root.a = { 'b': { 'toString': function() { } } };
 
     result = simplify(spotlight.byName('toString', { 'object': a }));
     expected = ['<object>.b.toString -> (function)'];
     deepEqual(result, expected, 'custom toString');
 
-    window.a = {};
+    root.a = {};
 
-    result = simplify(spotlight.byName('a', { 'object': window.window }));
+    result = simplify(spotlight.byName('a', { 'object': root.window }));
     expected = [rootName + '.a -> (object)'];
     deepEqual(result.slice(0, 1), expected, 'Opera < 10.53 window');
 
@@ -342,7 +349,7 @@
       skipTest(2);
     }
     else {
-      window.a = function() { };
+      root.a = function() { };
 
       result = simplify(spotlight.byName('prototype', { 'object': a }));
       deepEqual(result, [], 'skips prototype');
@@ -355,7 +362,7 @@
   /*--------------------------------------------------------------------------*/
 
   test('require("spotlight")', function() {
-    if (window.define && define.amd) {
+    if (root.define && define.amd) {
       strictEqual((spotlight2 || {}).debug, false, 'require("spotlight")');
     } else {
       skipTest();
@@ -364,7 +371,9 @@
 
   /*--------------------------------------------------------------------------*/
 
-  if (!window.document || window.phantom) {
+  QUnit.config.asyncRetries = 10;
+
+  if (!root.document || root.phantom) {
     QUnit.config.noglobals = true;
     QUnit.start();
   }
