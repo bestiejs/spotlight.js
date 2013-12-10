@@ -1,12 +1,24 @@
 ;(function(root, undefined) {
   'use strict';
 
+  /** Method and object shortcuts */
+  var phantom = root.phantom,
+      amd = root.define && define.amd,
+      document = !phantom && root.document,
+      noop = function() {},
+      slice = Array.prototype.slice,
+      toString = Object.prototype.toString;
+
+  /** Detect if running in Java */
+  var isJava = !document && !!root.java;
+
   /** Use a single "load" function */
-  var load = typeof require == 'function' ? require : root.load;
+  var load = (typeof require == 'function' && !amd)
+    ? require
+    : (isJava && root.load);
 
   /** The unit testing framework */
   var QUnit = (function() {
-    var noop = Function.prototype;
     return  root.QUnit || (
       root.addEventListener || (root.addEventListener = noop),
       root.setTimeout || (root.setTimeout = noop),
@@ -35,9 +47,6 @@
     ? 'global'
     : (typeof environment == 'object' ? '<global object>' : 'window');
 
-  /** Shortcut used to convert array-like objects to arrays */
-  var slice = Array.prototype.slice;
-
   /*--------------------------------------------------------------------------*/
 
   /**
@@ -49,9 +58,12 @@
    * @returns {Array} The filtered result.
    */
   function simplify(result) {
+    var index = -1,
+        length = result.length;
+
     result = slice.call(result);
-    for (var i = -1, l = result.length; ++i < l; ) {
-      result[i] = result[i][0];
+    while (++index < length) {
+      result[index] = result[index][0];
     }
     return result;
   }
@@ -60,7 +72,7 @@
    * Skips a given number of tests with a passing result.
    *
    * @private
-   * @param {Number} [count=1] The number of tests to skip.
+   * @param {number} [count=1] The number of tests to skip.
    */
   function skipTest(count) {
     count || (count = 1);
@@ -108,25 +120,25 @@
   test('custom __iterator__', function() {
     var result,
         skipped = 5,
-        noop = function() { },
         getDescriptor = Object.getOwnPropertyDescriptor,
         setDescriptor = Object.defineProperty;
 
     var has = {
-      'descriptors' : !!(function() {
+      'descriptors' : (function() {
         try {
           var o = {};
-          return (setDescriptor(o, o, o), 'value' in getDescriptor(o, o));
+          setDescriptor(o, o, o);
+          var result = 'value' in getDescriptor(o, o);
         } catch(e) { }
+        return !!result;
       }()),
 
-      'iterators': !!(function() {
+      'iterators': (function() {
         try {
-          var o = Iterator({ '': 1 }),
-              toString = o.toString;
+          var o = Iterator({ '': 1 });
           for (o in o) { }
-          return toString.call(o) == '[object Array]';
         } catch(e) { }
+        return toString.call(o) == '[object Array]';
       }())
     };
 
@@ -134,7 +146,7 @@
       skipped = 4;
 
       root.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
-      a.b.next = a.b.__iterator__ = function() { };
+      a.b.next = a.b.__iterator__ = function() {};
 
       result = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
       deepEqual(result, ['a.b.y -> (number)'], 'custom __iterator__');
@@ -327,13 +339,13 @@
   /*--------------------------------------------------------------------------*/
 
   test('for..in', function() {
-    root.a = { 'b': { 'valueOf': function() { } } };
+    root.a = { 'b': { 'valueOf': function() {} } };
 
     var result = simplify(spotlight.byName('valueOf', { 'object': a }));
     var expected = ['<object>.b.valueOf -> (function)'];
     deepEqual(result, expected, 'shadowed property');
 
-    root.a = { 'b': { 'toString': function() { } } };
+    root.a = { 'b': { 'toString': function() {} } };
 
     result = simplify(spotlight.byName('toString', { 'object': a }));
     expected = ['<object>.b.toString -> (function)'];
@@ -349,7 +361,7 @@
       skipTest(2);
     }
     else {
-      root.a = function() { };
+      root.a = function() {};
 
       result = simplify(spotlight.byName('prototype', { 'object': a }));
       deepEqual(result, [], 'skips prototype');
@@ -373,7 +385,7 @@
 
   QUnit.config.asyncRetries = 10;
 
-  if (!root.document || root.phantom) {
+  if (!document) {
     QUnit.config.noglobals = true;
     QUnit.start();
   }
