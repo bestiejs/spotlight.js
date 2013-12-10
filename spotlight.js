@@ -152,26 +152,28 @@
     } catch(e) {
       return;
     }
-    var index = -1,
-        props = _.keys(object),
-        length = props.length;
-
-    while (++index < length) {
-      var key = props[index];
-
-      // iterators will assign an array to `key`
-      if (iterator) {
-        var value = key[1];
-        key = key[0];
+    if (iterator) {
+      for (key in object) {
+        // iterators will assign an array to `key`
+        callback(key[1], key[0], object);
       }
-      // some properties like Firefox's `console.constructor` or IE's
-      // `element.offsetParent` may throw errors when accessed
-      try {
-        value = object[key];
-      } catch(e) {
-        continue;
+    }
+    else {
+      var index = -1,
+          props = _.keys(object),
+          length = props.length;
+
+      while (++index < length) {
+        // some properties like Firefox's `console.constructor` or IE's
+        // `element.offsetParent` may throw errors when accessed
+        try {
+          key = props[index];
+          var value = object[key];
+        } catch(e) {
+          continue;
+        }
+        callback(value, key, object);
       }
-      callback(value, key, object);
     }
   }
 
