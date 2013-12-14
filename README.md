@@ -14,9 +14,12 @@ For a list of upcoming features, check out our [roadmap](https://github.com/best
 
 ## Installation and usage
 
+Spotlight.js’ only hard dependency is [Lo-Dash](http://lodash.com/).
+
 In a browser:
 
 ```html
+<script src="lodash.js"></script>
 <script src="spotlight.js"></script>
 ```
 
@@ -43,7 +46,8 @@ In an AMD loader like [RequireJS](http://requirejs.org/):
 ```js
 require({
   'paths': {
-    'spotlight': 'path/to/spotlight'
+    'spotlight': 'path/to/spotlight',
+    'lodash': 'path/to/lodash'
   }
 },
 ['spotlight'], function(spotlight) {

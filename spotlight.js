@@ -112,7 +112,6 @@
 
   /**
    * Iterates over an object's own properties, executing the `callback` for each.
-   * Callbacks may terminate the loop by explicitly returning `false`.
    *
    * @private
    * @param {Object} object The object to iterate over.
@@ -472,14 +471,14 @@
    * @example
    *
    * // basic
-   * // > window.length -> (number) 0
    * spotlight.byName('length');
+   * // > window.length -> (number) 0
    *
    * // or with options
    * // (finds all "map" properties on jQuery)
+   * spotlight.byName('map', { 'object': jQuery, 'path': '$' });
    * // > $.map -> (function) function(a,b,c){...}
    * // > $.fn.map -> (function) function(a){...}
-   * spotlight.byName('map', { 'object': jQuery, 'path': '$' });
    */
   function byName(name, options) {
     return checkCall('name', 'string', name, options);
@@ -495,10 +494,10 @@
    * @example
    *
    * // basic
+   * spotlight.byValue(0);
    * // > window.pageXOffset -> (number) 0
    * // > window.screenX -> (number) 0
    * // > window.length -> (number) 0
-   * spotlight.byValue(0);
    */
   function byValue(value, options) {
     return checkCall('value', null, value, options);
