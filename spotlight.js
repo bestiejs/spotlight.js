@@ -44,13 +44,11 @@
   );
 
   /** Used to determine if values are of the language type Object */
-  var objectTypes = {
-    'boolean': false,
-    'function': true,
-    'object': true,
-    'number': false,
-    'string': false,
-    'undefined': false
+  var primitiveTypes = {
+    'boolean': true,
+    'number': true,
+    'string': true,
+    'undefined': true
   };
 
   /** Get Lo-Dash reference */
@@ -242,7 +240,7 @@
    */
   function isHostType(object, property) {
     var type = object != null ? typeof object[property] : 'number';
-    return objectTypes[type] && (type == 'object' ? !!object[property] : true);
+    return !primitiveTypes[type] && (type == 'object' ? !!object[property] : true);
   }
 
   /**
