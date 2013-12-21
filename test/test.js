@@ -138,7 +138,7 @@
           var o = Iterator({ '': 1 });
           for (o in o) { }
         } catch(e) { }
-        return toString.call(o) == '[object Array]';
+        return _.isArray(o);
       }())
     };
 
@@ -267,12 +267,9 @@
       rootName + '.a.foo.b.foo.c.foo -> (<' + rootName + '.a>)'
     ];
 
-    var filtered = [];
-    for (var index = 0, length = result.length; index < length; index++) {
-      if (/a\.foo/.test(result[index])) {
-        filtered.push(result[index]);
-      }
-    }
+    var filtered = _.filter(result, function (value) {
+      return /a\.foo/.test(value);
+    });
 
     deepEqual(filtered.sort(), expected, 'circular references');
 
@@ -281,12 +278,9 @@
       rootName + '.a.bar.b.foo.c.foo -> (<' + rootName + '.a>)'
     ];
 
-    filtered = [];
-    for (var index = 0, length = result.length; index < length; index++) {
-      if (/a\.bar/.test(result[index])) {
-        filtered.push(result[index]);
-      }
-    }
+    filtered = _.filter(result, function (value) {
+      return /a\.bar/.test(value);
+    });
 
     deepEqual(filtered.sort(), expected, 'sibling containing circular references');
 
