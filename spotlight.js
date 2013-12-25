@@ -309,24 +309,11 @@
         pooled,
         queue,
         separator,
-        roots = defaultRoots.slice(),
-        object = options.object || roots[0].object,
-        path = options.path,
+        object = options.object,
+        path = options.path || '<object>',
+        roots = object ? [{ 'object': object, 'path': path }] : defaultRoots.slice(),
         result = [];
 
-    // resolve undefined path
-    if (path == null) {
-      path = (
-        _.find(roots, function(data) {
-          return object == data.object;
-        }) ||
-        { 'path': '<object>' }
-      ).path;
-    }
-    // resolve object roots
-    if (options.object) {
-      roots = [{ 'object': object, 'path': path }];
-    }
     // crawl all root objects
     while ((data = roots.pop())) {
       index = 0;
@@ -387,10 +374,10 @@
    */
   function log() {
     var defaultCount = 2,
-        console = typeof root.console == 'object' && root.console,
-        document = typeof root.document == 'object' && root.document,
-        phantom = typeof root.phantom == 'object' && root.phantom,
-        JSON = typeof root.JSON == 'object' && _.isFunction(root.JSON && root.JSON.stringify) && root.JSON;
+        console = isHostType(root, 'console') && root.console,
+        document = isHostType(root, 'document') && root.document,
+        phantom = isHostType(root, 'phantom') && root.phantom,
+        JSON = isHostType(root, 'JSON') && _.isFunction(root.JSON && root.JSON.stringify) && root.JSON;
 
     // lazy define
     log = function(type, message, value) {
