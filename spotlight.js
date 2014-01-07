@@ -309,11 +309,19 @@
         pooled,
         queue,
         separator,
-        object = options.object,
-        path = options.path || '<object>',
-        roots = object ? [{ 'object': object, 'path': path }] : defaultRoots.slice(),
+        roots = defaultRoots.slice(),
+        object = options.object || roots[0].object,
+        path = options.path,
         result = [];
 
+    // resolve undefined path
+    if (path == null) {
+      path = _.result(_.find(roots, { 'object': object }), 'path') || '<object>';
+    }
+    // resolve object roots
+    if (options.object) {
+      roots = [{ 'object': object, 'path': path }];
+    }
     // crawl all root objects
     while ((data = roots.pop())) {
       index = 0;
@@ -551,7 +559,7 @@
 
   /*--------------------------------------------------------------------------*/
 
-  // mod `defaultRoots` for server-side environments
+  // set `defaultRoots` for server-side environments
   // for Narwhal, Node.js, or RingoJS
   if (freeExports && freeGlobal) {
     defaultRoots = [{ 'object': freeGlobal, 'path': 'global' }];
