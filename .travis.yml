@@ -4,11 +4,12 @@ node_js:
   - "0.8"
   - "0.10"
 env:
-  matrix:
+  global:
     - BIN="node"
-    - BIN="phantomjs"
 matrix:
   include:
+    - node_js: "0.10"
+      env: BIN="phantomjs"
     - node_js: "0.10"
       env: BIN="narwhal"
     - node_js: "0.10"
