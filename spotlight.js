@@ -5,43 +5,11 @@
  * Copyright 2011-2014 Angus Croll <http://javascriptweblog.wordpress.com/>
  * Both available under MIT license <http://mths.be/mit>
  */
-;(function(root, undefined) {
+;(function() {
   'use strict';
 
-  /** Backup possible global object */
-  var oldRoot = root;
-
-  /** Used as the starting point(s) for the object crawler */
-  var defaultRoots = [{ 'object': root, 'path': 'window' }];
-
-  /** Detect free variable `define` */
-  var freeDefine = typeof define == 'function' &&
-    typeof define.amd == 'object' && define.amd && define;
-
-  /** Detect free variable `exports` */
-  var freeExports = typeof exports == 'object' && exports;
-
-  /** Detect free variable `module` */
-  var freeModule = typeof module == 'object' && module && module.exports == freeExports && module;
-
-  /** Detect free variable `require` */
-  var freeRequire = typeof require == 'function' && require;
-
-  /** Detect free variable `global`, from Node.js or Browserified code, and use it as `root` */
-  var freeGlobal = typeof global == 'object' && global;
-  if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal) {
-    root = freeGlobal;
-  }
-
-  /** Used to resolve a value's internal [[Class]] */
-  var toString = {}.toString;
-
-  /** Used to detect if a method is native */
-  var reNative = RegExp('^' +
-    String(toString)
-      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-      .replace(/toString| for [^\]]+/g, '.*?') + '$'
-  );
+  /** Used as a safe reference for `undefined` in pre ES5 environments */
+  var undefined;
 
   /** Used to determine if values are of the language type Object */
   var objectTypes = {
@@ -52,6 +20,46 @@
     'string': false,
     'undefined': false
   };
+
+  /** Used as a reference to the global object */
+  var root = (objectTypes[typeof window] && window) || this;
+
+  /** Detect free variable `define` */
+  var freeDefine = typeof define == 'function' && typeof define.amd == 'object' && define.amd && define;
+
+  /** Detect free variable `exports` */
+  var freeExports = objectTypes[typeof exports] && exports && !exports.nodeType && exports;
+
+  /** Detect free variable `global` from Node.js or Browserified code and use it as `root` */
+  var freeGlobal = objectTypes[typeof global] && global;
+  if (freeGlobal && (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal || freeGlobal.self === freeGlobal)) {
+    root = freeGlobal;
+  }
+
+  /** Detect free variable `module` */
+  var freeModule = objectTypes[typeof module] && module && !module.nodeType && module;
+
+  /** Detect free variable `require` */
+  var freeRequire = typeof require == 'function' && require;
+
+  /** Used as the starting point(s) for the object crawler */
+  var defaultRoots = [{ 'object': root, 'path': 'window' }];
+
+  /** Used to decompile functions to their source */
+  var fnToString = Function.prototype.toString;
+
+  /** Backup possible global object */
+  var oldRoot = root;
+
+  /** Used to resolve a value's internal [[Class]] */
+  var toString = Object.prototype.toString;
+
+  /** Used to detect if a method is native */
+  var reNative = RegExp('^' +
+    String(toString)
+      .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+      .replace(/toString| for [^\]]+/g, '.*?') + '$'
+  );
 
   /** Get Lo-Dash reference */
   var _ = root && root._ || req('lodash');
@@ -253,7 +261,7 @@
    * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
    */
   function isNative(value) {
-    return typeof value == 'function' && reNative.test(value);
+    return typeof value == 'function' && reNative.test(fnToString.call(value));
   }
 
   /**
@@ -586,7 +594,7 @@
     define(spotlight);
   }
   // check for `exports` after `define` in case a build optimizer adds an `exports` object
-  else if (freeExports  && !freeExports.nodeType) {
+  else if (freeExports && freeModule) {
     // in Narwhal, Node.js, or RingoJS
     forOwn(spotlight, function(value, key) {
       freeExports[key] = value;
@@ -599,4 +607,4 @@
     // in a browser or Rhino
     root.spotlight = spotlight;
   }
-}(this));
+}.call(this));
