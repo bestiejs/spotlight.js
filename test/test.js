@@ -1,5 +1,10 @@
-;(function(root, undefined) {
-  'use strict';
+;(function() {
+
+  /** Used as a safe reference for `undefined` in pre ES5 environments */
+  var undefined;
+
+  /** Used as a reference to the global object */
+  var root = typeof global == 'object' && global || this;
 
   /** Method and object shortcuts */
   var phantom = root.phantom,
@@ -15,7 +20,7 @@
   /** Use a single "load" function */
   var load = (typeof require == 'function' && !amd)
     ? require
-    : (isJava && root.load);
+    : (isJava && root.load) || noop;
 
   /** The unit testing framework */
   var QUnit = (function() {
@@ -23,7 +28,6 @@
       root.addEventListener || (root.addEventListener = noop),
       root.setTimeout || (root.setTimeout = noop),
       root.QUnit = load('../vendor/qunit/qunit/qunit.js') || root.QUnit,
-      (load('../vendor/qunit-extras/qunit-extras.js') || { 'runInContext': noop }).runInContext(root),
       addEventListener === noop && delete root.addEventListener,
       root.QUnit
     );
@@ -46,6 +50,12 @@
   var rootName = (typeof global == 'object' && global)
     ? 'global'
     : (typeof environment == 'object' ? '<global object>' : 'window');
+
+  /** Load and install QUnit Extras */
+  var qa = load('../vendor/qunit-extras/qunit-extras.js');
+  if (qa) {
+    qa.runInContext(root);
+  }
 
   /*--------------------------------------------------------------------------*/
 
@@ -383,4 +393,4 @@
     QUnit.config.noglobals = true;
     QUnit.start();
   }
-}(typeof global == 'object' && global || this));
+}.call(this));
