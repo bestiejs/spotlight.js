@@ -11,8 +11,7 @@
       amd = root.define && define.amd,
       document = !phantom && root.document,
       noop = function() {},
-      slice = Array.prototype.slice,
-      toString = Object.prototype.toString;
+      slice = Array.prototype.slice;
 
   /** Detect if running in Java */
   var isJava = !document && !!root.java;
@@ -33,6 +32,12 @@
     );
   }());
 
+  /** Load and install QUnit Extras */
+  var qa = load('../vendor/qunit-extras/qunit-extras.js');
+  if (qa) {
+    qa.runInContext(root);
+  }
+
   /** The `lodash` utility function */
   var _ = root._ || (root._ = (
     _ = load('../vendor/lodash/dist/lodash.compat.js') || root._,
@@ -50,12 +55,6 @@
   var rootName = (typeof global == 'object' && global)
     ? 'global'
     : (typeof environment == 'object' ? '<global object>' : 'window');
-
-  /** Load and install QUnit Extras */
-  var qa = load('../vendor/qunit-extras/qunit-extras.js');
-  if (qa) {
-    qa.runInContext(root);
-  }
 
   /*--------------------------------------------------------------------------*/
 
@@ -379,7 +378,7 @@
 
   test('require("spotlight")', function() {
     if (amd) {
-      strictEqual((spotlight2 || {}).debug, false, 'require("spotlight")');
+      strictEqual((spotlightModule || {}).debug, false, 'require("spotlight")');
     } else {
       skipTest();
     }

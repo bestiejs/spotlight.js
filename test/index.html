@@ -22,26 +22,45 @@
 			);
 		</script>
 		<script>
-			var spotlight2;
+			var spotlightModule;
 
-			if (window.require) {
+			(function() {
+				if (!window.require) {
+					return;
+				}
 				QUnit.config.autostart = false;
 
-				// load Spotlight.js as a module
-				require({
-					'baseUrl': '../vendor/requirejs/',
+				requirejs.config({
+					'baseUrl': './',
 					'urlArgs': 't=' + (+new Date),
-					'paths': {
-						'spotlight': '../../spotlight'
-					}
-				},
-				['spotlight'], function(spotlight) {
-					spotlight2 = spotlight;
+					'waitSeconds': 0,
+					'packages': [
+						{
+							'name': 'spotlight',
+							'location': '..',
+							'main': 'spotlight'
+						},
+						{
+							'name': 'lodash',
+							'location': '../vendor/lodash/dist',
+							'main': 'lodash.compat'
+						},
+						{
+							'name': 'test',
+							'location': '.',
+							'main': 'test'
+						}
+					]
+				});
+
+				// load spotlight as a module
+				require(['spotlight'], function(spotlight) {
+					spotlightModule = spotlight;
 					require(['test.js'], function() {
 						QUnit.start();
 					});
 				});
-			}
+			}());
 		</script>
 	</body>
 </html>
