@@ -5,7 +5,7 @@ node_js:
   - "0.10"
 env:
   global:
-    - BIN="node"
+    - BIN="node" OPTION="" 
 matrix:
   include:
     - node_js: "0.10"
@@ -14,6 +14,8 @@ matrix:
       env: BIN="narwhal"
     - node_js: "0.10"
       env: BIN="rhino"
+    - node_js: "0.10"
+      env: BIN="rhino" OPTION="-require"
     - node_js: "0.10"
       env: BIN="ringo"
 git:
@@ -30,4 +32,4 @@ before_install:
   - "[ $BIN == 'ringo' ] && wget http://ringojs.org/downloads/ringojs-0.9.zip && sudo unzip ringojs-0.9 -d /opt && rm ringojs-0.9.zip || true"
   - "[ $BIN == 'ringo' ] && sudo ln -s /opt/ringojs-0.9/bin/ringo /usr/local/bin/ringo && sudo chmod +x /usr/local/bin/ringo || true"
 script:
-  - "cd test && $BIN ./test.js"
+  - "cd test && $BIN $OPTION ./test.js"
