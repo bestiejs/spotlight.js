@@ -46,10 +46,10 @@
   ));
 
   /** The `spotlight` object to test */
-  var spotlight = root.spotlight || (root.spotlight =
-    load('../spotlight.js') ||
-    root.spotlight
-  );
+  var spotlight = root.spotlight || (root.spotlight = (
+    spotlight = load('../spotlight.js') || root.spotlight,
+    spotlight.runInContext(root)
+  ));
 
   /** The root name for the environment */
   var rootName = (typeof global == 'object' && global)
@@ -93,7 +93,7 @@
   /*--------------------------------------------------------------------------*/
 
   // enable debug mode so `spotlight` methods return an array of log calls
-  spotlight.debug = true;
+  spotlight.debug(true);
 
   // avoid false positives for QUnit's `noglobals` checks
   QUnit.moduleStart(function() {
@@ -376,10 +376,11 @@
 
   /*--------------------------------------------------------------------------*/
 
-  test('require("spotlight")', function() {
+  test('supports loading Spotlight.js as a module', function() {
     if (amd) {
-      strictEqual((spotlightModule || {}).debug, false, 'require("spotlight")');
-    } else {
+      equal((spotlightModule || {}).version, spotlight.version);
+    }
+    else {
       skipTest();
     }
   });
