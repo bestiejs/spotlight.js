@@ -65,7 +65,7 @@
    *
    * @memberOf spotlight
    * @param {Object} [context=root] The context object.
-   * @returns {Object} Returns the `spotlight` object.
+   * @returns {Object} Returns a new `spotlight` object.
    */
   function runInContext(context) {
     // exit early if unable to acquire lodash
@@ -564,7 +564,7 @@
     }
 
     /**
-     * Enables or disables debug mode for methods.
+     * This function enables or disables debug mode for all `spotlight` methods.
      *
      * @memberOf spotlight
      * @param {boolean} value The flag value.
