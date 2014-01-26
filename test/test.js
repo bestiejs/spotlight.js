@@ -301,7 +301,7 @@
   /*--------------------------------------------------------------------------*/
 
   test('spotlight.byValue', function() {
-    var value = new String('special');
+    var value = new String('a');
     root.a = { 'b': { 'c': value } };
 
     var result = simplify(spotlight.byValue(value));
@@ -310,7 +310,7 @@
 
     root.a = { 'b': { 'c': 12 } };
 
-    result = simplify(spotlight.byValue('12'));
+    result = simplify(spotlight.byValue('12'), { 'object': a });
     deepEqual(result, [], 'strict match');
   });
 
@@ -324,14 +324,14 @@
       // avoid problems with `window.java` and `window.netscape` objects
       // potentially killing script execution when their values are coerced
       return typeof value == 'number' && value == now;
-    }));
+    }, { 'object': a }));
 
-    var expected = [rootName + '.a.b.c -> (number)'];
+    var expected = ['<object>.b.c -> (number)'];
     deepEqual(result.slice(0, 1), expected, 'basic');
 
     spotlight.custom(function() {
       result = slice.call(arguments);
-    }, { 'object': a.b });
+    }, { 'object': a });
 
     expected = [a.b.c, 'c', a.b];
     deepEqual(result, expected, 'callback arguments');
@@ -378,7 +378,7 @@
   /*--------------------------------------------------------------------------*/
 
   test('require("spotlight")', function() {
-    if (root.define && define.amd) {
+    if (amd) {
       strictEqual((spotlight2 || {}).debug, false, 'require("spotlight")');
     } else {
       skipTest();
