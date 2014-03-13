@@ -8,7 +8,7 @@
   "keywords": ["crawl", "find", "search", "utility"],
   "author": "John-David Dalton <john.david.dalton@gmail.com> (http://allyoucanleet.com/)",
   "bugs": "https://github.com/bestiejs/spotlight.js/issues",
-  "repository": { "type": "git", "url": "https://github.com/bestiejs/spotlight.js.git" },
+  "repository": "bestiejs/spotlight.js",
   "dependencies": {
     "lodash": "~2.4.1"
   },
