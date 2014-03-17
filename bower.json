@@ -1,0 +1,16 @@
+{
+  "name": "spotlight.js",
+  "version": "1.0.0",
+  "main": "spotlight.js",
+  "ignore": [
+    ".*",
+    "*.log",
+    "*.md",
+    "component.json",
+    "package.json",
+    "doc",
+    "node_modules",
+    "test",
+    "vendor"
+  ]
+}
