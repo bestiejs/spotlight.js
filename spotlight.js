@@ -1,7 +1,7 @@
 /*!
- * Spotlight.js v1.0.0-pre <http://github.com/bestiejs/spotlight.js/>
+ * Spotlight.js v1.0.0-pre <https://github.com/bestiejs/spotlight.js/>
  * Copyright 2011-2014 John-David Dalton <http://allyoucanleet.com/>
- * Based on Waldo <http://github.com/angus-c/waldo/>,
+ * Based on Waldo <https://github.com/angus-c/waldo/>,
  * Copyright 2011-2014 Angus Croll <http://javascriptweblog.wordpress.com/>
  * Both available under MIT license <http://mths.be/mit>
  */
@@ -11,7 +11,7 @@
   /** Used as a safe reference for `undefined` in pre ES5 environments */
   var undefined;
 
-  /** Used to determine if values are of the language type Object */
+  /** Used to determine if values are of the language type `Object` */
   var objectTypes = {
     'boolean': false,
     'function': true,
@@ -45,7 +45,7 @@
   /*--------------------------------------------------------------------------*/
 
   /**
-   * A wrapper around require() to suppress `module missing` errors.
+   * A wrapper around `require()` to suppress `module missing` errors.
    *
    * @private
    * @param {string} id The module id.
@@ -68,7 +68,7 @@
    * @returns {Object} Returns a new `spotlight` object.
    */
   function runInContext(context) {
-    // exit early if unable to acquire lodash
+    // exit early if unable to acquire Lo-Dash
     var _ = context && context._ || req('lodash') || root._;
     if (!_) {
       return { 'runInContext': runInContext };
@@ -84,7 +84,7 @@
     /** Used to indicate that methods will execute in debug mode */
     var isDebug = false;
 
-    /** Used to resolve a value's internal [[Class]] */
+    /** Used to resolve a value's internal `[[Class]]` */
     var toString = Object.prototype.toString;
 
     /** Used to detect if a method is native */
@@ -157,7 +157,7 @@
       if (context != freeGlobal) {
         defaultRoots.unshift({ 'object': context, 'path': '<module scope>' });
       }
-      // avoid explicitly crawling exports if it's crawled indirectly
+      // avoid explicitly crawling `exports` if it's crawled indirectly
       if (!(freeGlobal.exports == freeExports || context.exports == freeExports)) {
         defaultRoots.unshift({ 'object': freeExports, 'path': 'exports' });
       }
@@ -255,7 +255,7 @@
 
     /**
      * Mimics ES 5.1's `Object.prototype.toString` behavior by returning the
-     * value's [[Class]], "Null" or "Undefined" as well as other non-spec'ed results
+     * value's `[[Class]]`, "Null" or "Undefined" as well as other non-spec'ed results
      * like "Constructor" and "Global" .
      *
      * @private
@@ -273,7 +273,7 @@
       }
       else if (_.isFunction(value) && isHostType(value, 'prototype')) {
         // a function is assumed of kind "Constructor" if it has its own
-        // enumerable prototype properties or doesn't have a [[Class]] of Object
+        // enumerable prototype properties or doesn't have a `[[Class]]` of Object
         try {
           if (getClass(value.prototype) == 'Object') {
             for (var key in value.prototype) {
@@ -292,7 +292,7 @@
     /**
      * Host objects can return type values that are different from their actual
      * data type. The objects we are concerned with usually return non-primitive
-     * types of object, function, or unknown.
+     * types of "object", "function", or "unknown".
      *
      * @private
      * @param {mixed} object The owner of the property.
@@ -359,7 +359,7 @@
           path = options.path,
           result = [];
 
-      // resolve undefined path
+      // resolve `undefined` path
       if (path == null) {
         path = _.result(_.find(roots, { 'object': object }), 'path') || '<object>';
       }
@@ -479,17 +479,17 @@
 
     /**
      * Crawls environment objects logging all object properties whose values
-     * are of a specified constructor instance, [[Class]], or type.
+     * are of a specified constructor instance, `[[Class]]`, or type.
      *
      * @memberOf spotlight
-     * @param {Function|string} kind The constructor, [[Class]], or type to check against.
+     * @param {Function|string} kind The constructor, `[[Class]]`, or type to check against.
      * @param {Object} [options={}] The options object.
      * @example
      *
      * // by constructor
      * spotlight.byKind(jQuery);
      *
-     * // or by [[Class]]
+     * // or by `[[Class]]`
      * spotlight.byKind('RegExp');
      *
      * // or by type
