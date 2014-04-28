@@ -586,24 +586,25 @@
      * @type Object
      * @name spotlight
      */
-    return {
+    var spotlight = {};
 
-      /**
-       * The semantic version number.
-       *
-       * @static
-       * @memberOf spotlight
-       * @type string
-       */
-      'version': '1.0.0-pre',
+    /**
+     * The semantic version number.
+     *
+     * @static
+     * @memberOf spotlight
+     * @type string
+     */
+    spotlight.version = '1.0.0';
 
-      'byKind': byKind,
-      'byName': byName,
-      'byValue': byValue,
-      'custom': custom,
-      'debug': debug,
-      'runInContext': runInContext
-    };
+    spotlight.byKind = byKind;
+    spotlight.byName = byName;
+    spotlight.byValue = byValue;
+    spotlight.custom = custom;
+    spotlight.debug = debug;
+    spotlight.runInContext = runInContext;
+
+    return spotlight;
   }
 
   /*--------------------------------------------------------------------------*/
@@ -619,13 +620,13 @@
   // check for `exports` after `define` in case a build optimizer adds an `exports` object
   else if (freeExports && freeModule) {
     // in Narwhal, Node.js, Rhino -require, or RingoJS
-    freeExports.version = spotlight.version;
     freeExports.byKind = spotlight.byKind;
     freeExports.byName = spotlight.byName;
     freeExports.byValue = spotlight.byValue;
     freeExports.custom = spotlight.custom;
     freeExports.debug = spotlight.debug;
     freeExports.runInContext = spotlight.runInContext;
+    freeExports.version = spotlight.version;
   }
   else {
     // in a browser or Rhino
