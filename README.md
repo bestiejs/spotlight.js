@@ -99,3 +99,9 @@ spotlight.custom(function(value) { return !value; });
 | [![twitter/jdalton](http://gravatar.com/avatar/299a3d891ff1920b69c364d061007043?s=70)](http://twitter.com/jdalton "Follow @jdalton on Twitter") |
 |---|
 | [John-David Dalton](http://allyoucanleet.com/) |
+
+## Contributors
+
+| [![twitter/demoneaux](http://gravatar.com/avatar/029b19dba521584d83398ada3ecf6131?s=70)](https://twitter.com/demoneaux "Follow @demoneaux on Twitter") |
+|---|
+| [Benjamin Tan](http://d10.github.io/) |
