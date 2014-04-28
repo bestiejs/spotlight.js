@@ -383,25 +383,25 @@
           separator = path ? '.' : '';
 
           forOwn(object, function(value, key) {
-            // inspect objects
-            if (_.isPlainObject(value)) {
-              // clone current pool per prop on the current `object` to avoid
-              // sibling properties from polluting each others object pools
-              pool = data.pool.slice();
-
-              // check if already pooled (prevents infinite loops when handling circular references)
-              pooled = _.find(pool, function(data) {
-                return value == data.object;
-              });
-              // add to the "call" queue
-              if (!pooled) {
-                pool.push({ 'object': value, 'path': path + separator + key, 'pool': pool });
-                queue[queue.length] = pool[pool.length - 1];
-              }
-            }
-            // if filter passed, log it
             // (IE may throw errors coercing properties like `window.external` or `window.navigator`)
             try {
+              // inspect objects
+              if (_.isPlainObject(value)) {
+                // clone current pool per prop on the current `object` to avoid
+                // sibling properties from polluting each others object pools
+                pool = data.pool.slice();
+
+                // check if already pooled (prevents infinite loops when handling circular references)
+                pooled = _.find(pool, function(data) {
+                  return value == data.object;
+                });
+                // add to the "call" queue
+                if (!pooled) {
+                  pool.push({ 'object': value, 'path': path + separator + key, 'pool': pool });
+                  queue[queue.length] = pool[pool.length - 1];
+                }
+              }
+              // if filter passed, log it
               if (callback.call(data, callbackArg, key, object)) {
                 result.push([
                   path + separator + key + ' -> (' +

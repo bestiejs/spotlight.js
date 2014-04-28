@@ -362,7 +362,7 @@
     root.a = {};
 
     expected = [rootName + '.a -> (object)'];
-    actual = simplify(spotlight.byName('a', { 'object': root.window }));
+    actual = simplify(spotlight.byName('a', { 'object': (root === root.window ? root.window : root) }));
     deepEqual(actual.slice(0, 1), expected, 'Opera < 10.53 window');
 
     if (!Object.getOwnPropertyNames) {
