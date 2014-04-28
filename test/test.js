@@ -383,7 +383,7 @@
 
   test('supports loading Spotlight.js as a module', 1, function() {
     if (amd) {
-      equal((spotlightModule || {}).version, spotlight.version);
+      strictEqual((spotlightModule || {}).version, spotlight.version);
     }
     else {
       skipTest();
