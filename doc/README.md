@@ -1,4 +1,4 @@
-# Spotlight.js <sup>v1.0.0-pre</sup>
+# Spotlight.js <sup>v1.0.0</sup>
 
 <!-- div -->
 
@@ -57,10 +57,10 @@
 ### <a id="spotlightbykindkind-options"></a>`spotlight.byKind(kind, [options={}])`
 <a href="#spotlightbykindkind-options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L501 "View in source") [&#x24C9;][1]
 
-Crawls environment objects logging all object properties whose values are of a specified constructor instance, &#91;&#91;Class&#93;&#93;, or type.
+Crawls environment objects logging all object properties whose values are of a specified constructor instance, `[[Class]]`, or type.
 
 #### Arguments
-1. `kind` *(Function|string)*: The constructor, &#91;&#91;Class&#93;&#93;, or type to check against.
+1. `kind` *(Function|string)*: The constructor, `[[Class]]`, or type to check against.
 2. `[options={}]` *(Object)*: The options object.
 
 #### Example
@@ -68,7 +68,7 @@ Crawls environment objects logging all object properties whose values are of a s
 // by constructor
 spotlight.byKind(jQuery);
 
-// or by [[Class]]
+// or by `[[Class]]`
 spotlight.byKind('RegExp');
 
 // or by type
