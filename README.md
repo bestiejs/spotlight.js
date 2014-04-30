@@ -1,6 +1,6 @@
 # Spotlight.js <sup>v1.0.0</sup>
 
-An object crawler/property search library that works on nearly all JavaScript platforms<sup><a name="fnref1" href="#fn1">1</a></sup>.
+An object crawler/property search library that works on nearly all JavaScript platforms.
 
 ## BestieJS
 
@@ -89,10 +89,9 @@ spotlight.custom(function(value, key) { return key.indexOf('oo') > -1; });
 spotlight.custom(function(value) { return !value; });
 ```
 
-## Footnotes
+## Support
 
-  1. Spotlight.js has been tested in at least Chrome 33-34, Firefox 27-28, IE 6-11, Opera 19-20, Safari 5-7, Node.js 0.6.21~0.10.26, Narwhal 0.3.2, PhantomJS 1.9.2, RingoJS 0.9, and Rhino 1.7RC5.
-     <a name="fn1" title="Jump back to footnote 1 in the text." href="#fnref1">&#8617;</a>
+Tested in Chrome (19, 33-34), Firefox (3, 20, 27-28), IE 6-11, Opera (10, 12, 19-20), Safari 5-7, Node.js 0.6.21~0.10.26, Narwhal 0.3.2, PhantomJS 1.9.2, RingoJS 0.9, & Rhino 1.7RC5.
 
 ## Author
 
