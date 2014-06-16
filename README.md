@@ -1,18 +1,13 @@
-# Spotlight.js <sup>v1.0.0</sup>
+# Spotlight.js v1.0.0
 
 An object crawler/property search library that works on nearly all JavaScript platforms.
 
-## BestieJS
-
-Spotlight.js is part of the BestieJS *"Best in Class"* module collection. This means we promote solid browser/environment support, ES5+ precedents, unit testing, and plenty of documentation.
-
 ## Documentation
 
-The documentation for Spotlight.js can be viewed here: [/doc/README.md](https://github.com/bestiejs/spotlight.js/blob/master/doc/README.md#readme)
+* [doc/README.md](https://github.com/bestiejs/spotlight.js/blob/master/doc/README.md#readme)
+* [wiki/Roadmap](https://github.com/bestiejs/spotlight.js/wiki/Roadmap)
 
-For a list of upcoming features, check out our [roadmap](https://github.com/bestiejs/spotlight.js/wiki/Roadmap).
-
-## Installation and usage
+## Installation
 
 Spotlight.js’ only hard dependency is [Lo-Dash](http://lodash.com/).
 
@@ -23,25 +18,7 @@ In a browser:
 <script src="spotlight.js"></script>
 ```
 
-Via [npm](http://npmjs.org/):
-
-```bash
-npm install spotlight
-```
-
-In [Node.js](http://nodejs.org/) and [RingoJS](http://ringojs.org/):
-
-```js
-var spotlight = require('spotlight');
-```
-
-In [Rhino](http://www.mozilla.org/rhino/):
-
-```js
-load('spotlight.js');
-```
-
-In an AMD loader like [RequireJS](http://requirejs.org/):
+In an AMD loader:
 
 ```js
 require({
@@ -50,9 +27,19 @@ require({
     'lodash': 'path/to/lodash'
   }
 },
-['spotlight'], function(spotlight) {
-  spotlight.byKind('constructor');
-});
+['spotlight'], function(spotlight) {/*…*/});
+```
+
+Using npm:
+
+```bash
+$ npm i --save spotlight
+```
+
+In Node.js:
+
+```js
+var spotlight = require('spotlight');
 ```
 
 Usage example:
@@ -91,7 +78,11 @@ spotlight.custom(function(value) { return !value; });
 
 ## Support
 
-Tested in Chrome 34-35, Firefox 28-29, IE 6-11, Opera 20-21, Safari 5-7, Node.js 0.6.21~0.10.28, Narwhal 0.3.2, PhantomJS 1.9.2, RingoJS 0.9, & Rhino 1.7RC5.
+Tested in Chrome 34-35, Firefox 29-30, IE 6-11, Opera 21-22, Safari 5-7, Node.js 0.8.26~0.10.28, PhantomJS 1.9.2, RingoJS 0.9, & Rhino 1.7RC5.
+
+## BestieJS
+
+Spotlight.js is part of the BestieJS *“Best in Class”* module collection. This means we promote solid browser/environment support, ES5+ precedents, unit testing, & plenty of documentation.
 
 ## Author
 
