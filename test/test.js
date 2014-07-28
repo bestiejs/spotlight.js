@@ -138,15 +138,15 @@
           var o = {};
           setDescriptor(o, o, o);
           var result = 'value' in getDescriptor(o, o);
-        } catch(e) { }
+        } catch(e) {}
         return !!result;
       }()),
 
       'iterators': (function() {
         try {
           var o = Iterator({ '': 1 });
-          for (o in o) { }
-        } catch(e) { }
+          for (o in o) {}
+        } catch(e) {}
         return _.isArray(o);
       }())
     };
@@ -194,7 +194,7 @@
   /*--------------------------------------------------------------------------*/
 
   test('spotlight.byKind', 8, function() {
-    function Klass() { }
+    function Klass() {}
     root.a = { 'b': { 'c': new Klass } };
 
     var expected = [rootName + '.a.b.c -> (object)'],
@@ -263,8 +263,8 @@
     deepEqual(actual.slice(0, 3), expected, 'multiple matches');
 
     root.a = {
-      'foo': { 'b': { 'foo': { 'c': { } } } },
-      'bar': { }
+      'foo': { 'b': { 'foo': { 'c': {} } } },
+      'bar': {}
     };
     a.foo.b.foo.c.foo = a;
     a.bar.b = a.foo.b;

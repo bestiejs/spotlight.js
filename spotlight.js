@@ -54,7 +54,7 @@
   function req(id) {
     try {
       var result = freeExports && freeRequire(id);
-    } catch(e) { }
+    } catch(e) {}
     return result || null;
   }
 
@@ -130,7 +130,7 @@
           var o = {};
           setDescriptor(o, o, o);
           var result = 'value' in getDescriptor(o, o);
-        } catch(e) { };
+        } catch(e) {};
         return !!result;
       }()),
 
@@ -141,8 +141,8 @@
       'iterators': (function() {
         try {
           var o = Iterator({ '': 1 });
-          for (o in o) { }
-        } catch(e) { }
+          for (o in o) {}
+        } catch(e) {}
         return _.isArray(o);
       }())
     };
@@ -248,7 +248,7 @@
       }
       try {
         var result = _.result(/^\[object (.*?)\]$/.exec(toString.call(value)), 1);
-      } catch(e) { }
+      } catch(e) {}
 
       return result || '';
     }
@@ -283,7 +283,7 @@
           } else {
             result = 'Constructor';
           }
-        } catch(e) { }
+        } catch(e) {}
       }
       return result || getClass(value) ||
         (result = typeof value, result.charAt(0).toUpperCase() + result.slice(1))
@@ -410,7 +410,7 @@
                 ]);
                 log('text', result[result.length - 1][0], value);
               }
-            } catch(e) { }
+            } catch(e) {}
           });
         } while ((data = queue[index++]));
       }
@@ -466,7 +466,7 @@
       }
       // use noop for no log support
       if (!isHostType(console, 'log')) {
-        log = function() { };
+        log = function() {};
       }
       // avoid Safari 2 crash bug when passing more than 1 argument
       else if (console.log.length == 1) {
