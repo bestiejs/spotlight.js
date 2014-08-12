@@ -345,7 +345,7 @@
      * @returns {Array} An array of arguments passed to each `console.log()` call.
      */
     function crawl(callback, callbackArg, options) {
-      callback = filters[callback] || callback;
+      callback = filters[callback];
       options || (options = {});
 
       var data,
@@ -355,16 +355,16 @@
           queue,
           separator,
           roots = defaultRoots.slice(),
-          object = options.object || roots[0].object,
+          object = options.object,
           path = options.path,
           result = [];
 
-      // resolve `undefined` path
-      if (path == null) {
-        path = _.result(_.find(roots, { 'object': object }), 'path') || '<object>';
-      }
       // resolve object roots
-      if (options.object) {
+      if (object) {
+        // resolve `undefined` path
+        if (path == null) {
+          path = _.result(_.find(roots, { 'object': object }), 'path') || '<object>';
+        }
         roots = [{ 'object': object, 'path': path }];
       }
       // crawl all root objects
@@ -398,17 +398,18 @@
                 // add to the "call" queue
                 if (!pooled) {
                   pool.push({ 'object': value, 'path': path + separator + key, 'pool': pool });
-                  queue[queue.length] = pool[pool.length - 1];
+                  queue.push(_.last(pool));
                 }
               }
               // if filter passed, log it
               if (callback.call(data, callbackArg, key, object)) {
-                result.push([
+                value = [
                   path + separator + key + ' -> (' +
-                  (true && pooled ? '<' + pooled.path + '>' : getKindOf(value).toLowerCase()) + ')',
+                  (pooled ? '<' + pooled.path + '>' : getKindOf(value).toLowerCase()) + ')',
                   value
-                ]);
-                log('text', result[result.length - 1][0], value);
+                ];
+                result.push(value);
+                log('text', value[0], value[1]);
               }
             } catch(e) {}
           });
