@@ -112,7 +112,7 @@
           : typeof value == kind || getKindOf(value).toLowerCase() == kind.toLowerCase()
         );
       },
-      'name': function(value, key, object) {
+      'name': function(value, key) {
         return value == key;
       },
       'value': function(value, key, object) {
@@ -213,7 +213,7 @@
       if (iterator) {
         for (key in object) {
           // iterators will assign an array to `key`
-          callback(key[1], key[0], object);
+          callback(key[1], key[0]);
         }
       }
       else {
@@ -230,7 +230,7 @@
           } catch(e) {
             continue;
           }
-          callback(value, key, object);
+          callback(value, key);
         }
       }
     }
