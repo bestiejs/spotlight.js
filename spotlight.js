@@ -74,7 +74,7 @@
    */
   function runInContext(context) {
     // exit early if unable to acquire Lo-Dash
-    var _ = context && context._ || req('lodash') || root._;
+    var _ = context && context._ || !freeDefine && req('lodash') || root._;
     if (!_) {
       return { 'runInContext': runInContext };
     }
@@ -627,7 +627,11 @@
   // some AMD build optimizers like r.js check for condition patterns like the following:
   if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
     // define as an anonymous module so, through path mapping, it can be aliased
-    define(spotlight);
+    define(['lodash'], function(_) {
+      return runInContext({
+        '_': _
+      });
+    });
   }
   // check for `exports` after `define` in case a build optimizer adds an `exports` object
   else if (freeExports && freeModule) {
