@@ -11,6 +11,11 @@
   /** Used as a safe reference for `undefined` in pre ES5 environments */
   var undefined;
 
+  /** Used to assign default `context` object properties */
+  var contextProps = [
+    'Function', 'Iterator', 'Object', 'RegExp', 'String'
+  ];
+
   /** Used to determine if values are of the language type `Object` */
   var objectTypes = {
     'boolean': false,
@@ -73,10 +78,16 @@
     if (!_) {
       return { 'runInContext': runInContext };
     }
-    context || (context = root);
+
+    // Avoid issues with some ES3 environments that attempt to use values, named
+    // after built-in constructors like `Object`, for the creation of literals.
+    // ES5 clears this up by stating that literals must use built-in constructors.
+    // See http://es5.github.io/#x11.1.5.
+    context = context ? _.defaults(root.Object(), context, _.pick(root, contextProps)) : root;
 
     /** Native constructor references */
     var Function = context.Function,
+        Iterator = context.Iterator,
         Object = context.Object,
         RegExp = context.RegExp,
         String = context.String;
