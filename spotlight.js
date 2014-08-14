@@ -91,7 +91,7 @@
     var reNative = RegExp('^' +
       String(toString)
         .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-        .replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+        .replace(/\s?toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
     );
 
     /** Native method shortcuts */
@@ -312,7 +312,7 @@
      * @returns {boolean} Returns `true` if the `value` is a native function, else `false`.
      */
     function isNative(value) {
-      return typeof value == 'function' && reNative.test(fnToString.call(value));
+      return _.isFunction(value) && reNative.test(fnToString.call(value));
     }
 
     /*------------------------------------------------------------------------*/
