@@ -13,7 +13,8 @@
 
   /** Used to assign default `context` object properties */
   var contextProps = [
-    'Function', 'Iterator', 'Object', 'RegExp', 'String'
+    'console', 'document', 'environment', 'exports', 'Function', 'Iterator',
+    'java', 'JSON', 'Object', 'phantom', 'print', 'RegExp', 'String'
   ];
 
   /** Used to determine if values are of the language type `Object` */
@@ -83,6 +84,7 @@
     // after built-in constructors like `Object`, for the creation of literals.
     // ES5 clears this up by stating that literals must use built-in constructors.
     // See http://es5.github.io/#x11.1.5.
+    var originalContext = context;
     context = context ? _.defaults(root.Object(), context, _.pick(root, contextProps)) : root;
 
     /** Native constructor references */
@@ -159,14 +161,14 @@
     };
 
     /** Used as the starting point(s) for the object crawler */
-    var defaultRoots = [{ 'object': context, 'path': 'window' }];
+    var defaultRoots = [{ 'object': originalContext, 'path': 'window' }];
 
     // set `defaultRoots` for CLI environments like Narwhal, Node.js, or RingoJS
     if (freeGlobal) {
       defaultRoots = [{ 'object': freeGlobal, 'path': 'global' }];
       // for the Narwhal REPL
-      if (context != freeGlobal) {
-        defaultRoots.unshift({ 'object': context, 'path': '<module scope>' });
+      if (originalContext != freeGlobal) {
+        defaultRoots.unshift({ 'object': originalContext, 'path': '<module scope>' });
       }
       // avoid explicitly crawling `exports` if it's crawled indirectly
       if (!(freeGlobal.exports == freeExports || context.exports == freeExports)) {
