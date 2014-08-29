@@ -345,6 +345,40 @@
 
   /*--------------------------------------------------------------------------*/
 
+  test('spotlight.debug', 2, function() {
+    var actual,
+        expected,
+        value = new String('a'),
+        customSpotlight = spotlight.runInContext({
+          'console': {
+            'log': function() {
+              // no-op function
+            }
+          },
+          '_': _
+        });
+
+    expected = ['<object>.b.c -> (string)'];
+
+    customSpotlight.debug(true);
+    actual = simplify(customSpotlight.byValue(value, {
+      'object': { 'b': { 'c': value } }
+    }));
+
+    deepEqual(actual, expected, 'spotlight.debug(true)');
+
+    expected = undefined;
+
+    customSpotlight.debug(false);
+    actual = customSpotlight.byValue(value, {
+      'object': { 'b': { 'c': value } }
+    });
+
+    strictEqual(actual, expected, 'spotlight.debug(false)');
+  });
+
+  /*--------------------------------------------------------------------------*/
+
   test('for..in', 5, function() {
     root.a = { 'b': { 'valueOf': function() {} } };
 
