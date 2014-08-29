@@ -125,7 +125,10 @@
         return value == key;
       },
       'value': function(value, key, object) {
-        return object[key] === value;
+        return value === value
+          ? object[key] === value
+          // special case for `NaN`
+          : object[key] !== object[key];
       }
     };
 
@@ -546,7 +549,11 @@
 
     /**
      * Crawls environment objects logging all object properties whose values are
-     * a strict match for the specified value.
+     * a match for the specified value, using `SameValueZero` for equality comparisons.
+     *
+     * **Note:** `SameValueZero` is like strict equality, e.g. `===`, except that
+     * `NaN` matches `NaN`. See the [ES6 spec](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero)
+     * for more details.
      *
      * @memberOf spotlight
      * @param {*} value The value to search for.

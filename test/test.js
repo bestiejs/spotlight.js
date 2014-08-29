@@ -301,7 +301,7 @@
 
   /*--------------------------------------------------------------------------*/
 
-  test('spotlight.byValue', 2, function() {
+  test('spotlight.byValue', 3, function() {
     var value = new String('a');
     root.a = { 'b': { 'c': value } };
 
@@ -314,6 +314,13 @@
 
     actual = simplify(spotlight.byValue('12'), { 'object': a });
     deepEqual(actual, [], 'strict match');
+
+    root.a = { 'b': { 'c': NaN } };
+
+    expected = [rootName + '.a.b.c -> (number)'];
+
+    actual = simplify(spotlight.byValue(NaN), { 'object': a });
+    deepEqual(actual, expected, '`NaN`');
   });
 
   /*--------------------------------------------------------------------------*/
