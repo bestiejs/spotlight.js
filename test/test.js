@@ -345,6 +345,30 @@
 
   /*--------------------------------------------------------------------------*/
 
+  test('spotlight.runInContext', 1, function() {
+    var actual,
+        expected,
+        value = new String('a'),
+        customSpotlight = spotlight.runInContext({
+          'console': {
+            'log': function(value, _) {
+              actual = value;
+            }
+          },
+          '_': _
+        });
+
+    expected = '<object>.b.c -> (string)';
+
+    customSpotlight.byValue(value, {
+      'object': { 'b': { 'c': value } }
+    });
+
+    deepEqual(actual, expected);
+  });
+
+  /*--------------------------------------------------------------------------*/
+
   test('spotlight.debug', 2, function() {
     var actual,
         expected,
