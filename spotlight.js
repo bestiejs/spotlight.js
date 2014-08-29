@@ -114,10 +114,6 @@
 
     /** Filter functions used by `crawl` */
     var filters = {
-      'custom': function(value, key, object) {
-        // the `this` binding is set by `crawl()`
-        return value.call(this, object[key], key, object);
-      },
       'kind': function(value, key, object) {
         var kind = [value, value = object[key]][0];
         return kind == '*' || (_.isFunction(kind)
@@ -358,8 +354,14 @@
      * @returns {Array} An array of arguments passed to each `console.log()` call.
      */
     function crawl(callback, callbackArg, options) {
-      callback = filters[callback];
       options || (options = {});
+
+      if (callback == 'custom') {
+        var isCustom = true;
+      } else {
+        isCustom = false;
+        callback = filters[callback];
+      }
 
       var data,
           index,
@@ -415,7 +417,11 @@
                 }
               }
               // if filter passed, log it
-              if (callback.call(data, callbackArg, key, object)) {
+              if (
+                isCustom
+                  ? callbackArg.call(data, value, key, object)
+                  : callback(callbackArg, key, object)
+              ) {
                 value = [
                   path + separator + key + ' -> (' +
                   (pooled ? '<' + pooled.path + '>' : getKindOf(value).toLowerCase()) + ')',
