@@ -6,5 +6,8 @@
   "license": "MIT",
   "main": "spotlight.js",
   "keywords": ["crawl", "find", "search", "utility"],
-  "scripts": ["spotlight.js"]
+  "scripts": ["spotlight.js"],
+  "dependencies": {
+    "lodash/lodash": "~2.4.1"
+  }
 }

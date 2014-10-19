@@ -2,6 +2,9 @@
   "name": "spotlight.js",
   "version": "1.0.0",
   "main": "spotlight.js",
+  "dependencies": {
+    "lodash": "~2.4.1"
+  },
   "ignore": [
     ".*",
     "*.log",
