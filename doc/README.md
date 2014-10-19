@@ -1,4 +1,4 @@
-# Spotlight.js <sup>v1.0.0</sup>
+# Spotlight.js <sup>v1.1.0</sup>
 
 <!-- div -->
 
@@ -31,7 +31,7 @@
 <!-- div -->
 
 ### <a id="spotlight"></a>`spotlight`
-<a href="#spotlight">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L589 "View in source") [&#x24C9;][1]
+<a href="#spotlight">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L615 "View in source") [&#x24C9;][1]
 
 *(Object)*: The primary namespace.
 
@@ -43,7 +43,7 @@
 <!-- div -->
 
 ### <a id="spotlightversion"></a>`spotlight.version`
-<a href="#spotlightversion">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L598 "View in source") [&#x24C9;][1]
+<a href="#spotlightversion">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L624 "View in source") [&#x24C9;][1]
 
 *(string)*: The semantic version number.
 
@@ -55,7 +55,7 @@
 <!-- div -->
 
 ### <a id="spotlightbykindkind-options"></a>`spotlight.byKind(kind, [options={}])`
-<a href="#spotlightbykindkind-options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L501 "View in source") [&#x24C9;][1]
+<a href="#spotlightbykindkind-options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L523 "View in source") [&#x24C9;][1]
 
 Crawls environment objects logging all object properties whose values are of a specified constructor instance, `[[Class]]`, or type.
 
@@ -86,7 +86,7 @@ spotlight.byKind('constructor');
 <!-- div -->
 
 ### <a id="spotlightbynamename-options"></a>`spotlight.byName(name, [options={}])`
-<a href="#spotlightbynamename-options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L523 "View in source") [&#x24C9;][1]
+<a href="#spotlightbynamename-options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L545 "View in source") [&#x24C9;][1]
 
 Crawls environment objects logging all object properties of the specified name.
 
@@ -115,9 +115,10 @@ spotlight.byName('map', { 'object': jQuery, 'path': '$' });
 <!-- div -->
 
 ### <a id="spotlightbyvaluevalue-options"></a>`spotlight.byValue(value, [options={}])`
-<a href="#spotlightbyvaluevalue-options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L542 "View in source") [&#x24C9;][1]
+<a href="#spotlightbyvaluevalue-options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L568 "View in source") [&#x24C9;][1]
 
-Crawls environment objects logging all object properties whose values are a strict match for the specified value.
+Crawls environment objects logging all object properties whose values are a match for the specified value, using `SameValueZero` for equality comparisons.
+ &#42;Note:&#42;&#42; `SameValueZero` is like strict equality, e.g. `===`, except that `NaN` matches `NaN`. See the &#91;ES6 spec&#93;(https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero) for more details.
 
 #### Arguments
 1. `value` *(&#42;)*: The value to search for.
@@ -140,7 +141,7 @@ spotlight.byValue(0);
 <!-- div -->
 
 ### <a id="spotlightcustomcallback-options"></a>`spotlight.custom(callback, [options={}])`
-<a href="#spotlightcustomcallback-options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L562 "View in source") [&#x24C9;][1]
+<a href="#spotlightcustomcallback-options">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L588 "View in source") [&#x24C9;][1]
 
 Crawls environment objects executing `callback`, passing the current `value`, `key`, and `object` as arguments, against each object encountered and logs properties for which `callback` returns true.
 
@@ -165,7 +166,7 @@ spotlight.custom(function(value) { return !value; });
 <!-- div -->
 
 ### <a id="spotlightdebugvalue"></a>`spotlight.debug(value)`
-<a href="#spotlightdebugvalue">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L577 "View in source") [&#x24C9;][1]
+<a href="#spotlightdebugvalue">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L603 "View in source") [&#x24C9;][1]
 
 This function enables or disables debug mode for all `spotlight` methods.
 
@@ -187,7 +188,7 @@ spotlight.byName('length');
 <!-- div -->
 
 ### <a id="spotlightrunincontextcontextroot"></a>`spotlight.runInContext([context=root])`
-<a href="#spotlightrunincontextcontextroot">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L70 "View in source") [&#x24C9;][1]
+<a href="#spotlightrunincontextcontextroot">#</a> [&#x24C8;](https://github.com/bestiejs/spotlight.js/blob/master/spotlight.js#L76 "View in source") [&#x24C9;][1]
 
 Create a new `spotlight` object using the given `context` object.
 

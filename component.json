@@ -1,7 +1,7 @@
 {
   "name": "spotlight.js",
   "repo": "bestiejs/spotlight.js",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "An object crawler/property search library that works on nearly all JavaScript platforms.",
   "license": "MIT",
   "main": "spotlight.js",
