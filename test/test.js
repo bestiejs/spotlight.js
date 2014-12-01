@@ -111,18 +111,14 @@
   test('method options', 3, function() {
     root.a = { 'a': { 'a': { 'b': { 'c': 12 } } } };
 
-    var expected = ['<path>.a -> (object)'],
-        actual = simplify(spotlight.byName('a', { 'object': a.a, 'path': '<path>' }));
+    var actual = simplify(spotlight.byName('a', { 'object': a.a, 'path': '<path>' }));
+    deepEqual(actual, ['<path>.a -> (object)'], 'passing options');
 
-    deepEqual(actual, expected, 'passing options');
-
-    expected = ['a -> (object)'];
     actual = simplify(spotlight.byName('a', { 'object': a.a, 'path': '' }));
-    deepEqual(actual, expected, 'path as ""');
+    deepEqual(actual, ['a -> (object)'], 'path as ""');
 
-    expected = ['<object>.a -> (object)'];
     actual = simplify(spotlight.byName('a', { 'object': a.a }));
-    deepEqual(actual, expected, 'no path');
+    deepEqual(actual, ['<object>.a -> (object)'], 'no path');
   });
 
   /*--------------------------------------------------------------------------*/
@@ -197,39 +193,32 @@
     function Klass() {}
     root.a = { 'b': { 'c': new Klass } };
 
-    var expected = [rootName + '.a.b.c -> (object)'],
-        actual = simplify(spotlight.byKind(Klass));
-
-    deepEqual(actual.slice(0, 1), expected, 'Klass instance');
+    var actual = simplify(spotlight.byKind(Klass));
+    deepEqual(actual.slice(0, 1), [rootName + '.a.b.c -> (object)'], 'Klass instance');
 
     root.a = { 'b': { 'c': [] } };
 
-    expected = ['<object>.b.c -> (array)'];
     actual = simplify(spotlight.byKind('Array', { 'object': a }));
-    deepEqual(actual, expected, '[[Class]]');
+    deepEqual(actual, ['<object>.b.c -> (array)'], '[[Class]]');
 
-    expected = ['<object>.b.c -> (array)'];
     actual = simplify(spotlight.byKind('array', { 'object': a }));
-    deepEqual(actual, expected, 'lowercase [[Class]]');
+    deepEqual(actual, ['<object>.b.c -> (array)'], 'lowercase [[Class]]');
 
-    expected = ['<object>.c -> (array)'];
     actual = simplify(spotlight.byKind('object', { 'object': a.b }));
-    deepEqual(actual, expected, 'typeof');
+    deepEqual(actual, ['<object>.c -> (array)'], 'typeof');
 
     actual = simplify(spotlight.byKind('Object', { 'object': a.b }));
     deepEqual(actual, [], 'no-match [[Class]]');
 
     root.a = { 'b': { 'c': null } };
 
-    expected = ['<object>.b.c -> (null)'];
     actual = simplify(spotlight.byKind('null', { 'object': a }));
-    deepEqual(actual, expected, 'null');
+    deepEqual(actual, ['<object>.b.c -> (null)'], 'null');
 
     root.a = { 'b': { 'c': undefined } };
 
-    expected = ['<object>.b.c -> (undefined)'];
     actual = simplify(spotlight.byKind('undefined', { 'object': a }));
-    deepEqual(actual, expected, 'undefined');
+    deepEqual(actual, ['<object>.b.c -> (undefined)'], 'undefined');
 
     actual = spotlight.byKind(null);
     strictEqual(actual, null, 'incorrect argument');
@@ -240,20 +229,17 @@
   test('spotlight.byName', 6, function() {
     root.a = { 'b': { 'c': 12 } };
 
-    var expected = [rootName + '.a.b.c -> (number)'],
-        actual = simplify(spotlight.byName('c'));
-
-    deepEqual(actual.slice(0, 1), expected, 'basic');
+    var actual = simplify(spotlight.byName('c'));
+    deepEqual(actual.slice(0, 1), [rootName + '.a.b.c -> (number)'], 'basic');
 
     root.a = { 'a': { 'a': { 'b': { 'c': 12 } } } };
 
-    expected = [rootName + '.a.a.a.b.c -> (number)'];
     actual = simplify(spotlight.byName('c'));
-    deepEqual(actual.slice(0, 1), expected, 'repeated property names');
+    deepEqual(actual.slice(0, 1), [rootName + '.a.a.a.b.c -> (number)'], 'repeated property names');
 
     root.a = { 'foo': { 'b': { 'foo': { 'c': { 'foo': 12 } } } } };
 
-    expected = [
+    var expected = [
       rootName + '.a.foo -> (object)',
       rootName + '.a.foo.b.foo -> (object)',
       rootName + '.a.foo.b.foo.c.foo -> (number)'
@@ -278,7 +264,7 @@
     actual = simplify(spotlight.byName('foo'));
 
     // QUnit can't handle circular references :/
-    var filtered = _.filter(actual, function (value) {
+    var filtered = _.filter(actual, function(value) {
       return /a\.foo/.test(value);
     });
 
@@ -289,7 +275,7 @@
       rootName + '.a.bar.b.foo.c.foo -> (<' + rootName + '.a>)'
     ];
 
-    filtered = _.filter(actual, function (value) {
+    filtered = _.filter(actual, function(value) {
       return /a\.bar/.test(value);
     });
 
@@ -305,22 +291,18 @@
     var value = new String('a');
     root.a = { 'b': { 'c': value } };
 
-    var expected = [rootName + '.a.b.c -> (string)'],
-        actual = simplify(spotlight.byValue(value));
-
-    deepEqual(actual.slice(0, 1), expected, 'basic');
+    var actual = simplify(spotlight.byValue(value));
+    deepEqual(actual.slice(0, 1), [rootName + '.a.b.c -> (string)'], 'basic');
 
     root.a = { 'b': { 'c': 12 } };
 
-    actual = simplify(spotlight.byValue('12'), { 'object': a });
+    actual = simplify(spotlight.byValue('12', { 'object': a }));
     deepEqual(actual, [], 'strict match');
 
     root.a = { 'b': { 'c': NaN } };
 
-    expected = [rootName + '.a.b.c -> (number)'];
-
-    actual = simplify(spotlight.byValue(NaN), { 'object': a });
-    deepEqual(actual, expected, '`NaN`');
+    actual = simplify(spotlight.byValue(NaN, { 'object': a }));
+    deepEqual(actual, ['<object>.b.c -> (number)'], '`NaN`');
   });
 
   /*--------------------------------------------------------------------------*/
@@ -329,22 +311,19 @@
     var now = String(+new Date);
     root.a = { 'b': { 'c': +now } };
 
-    var expected = ['<object>.b.c -> (number)'];
-
     var actual = simplify(spotlight.custom(function(value, key) {
       // avoid problems with `window.java` and `window.netscape` objects
       // potentially killing script execution when their values are coerced
       return typeof value == 'number' && value == now;
     }, { 'object': a }));
 
-    deepEqual(actual.slice(0, 1), expected, 'basic');
+    deepEqual(actual.slice(0, 1), ['<object>.b.c -> (number)'], 'basic');
 
     spotlight.custom(function() {
       actual = slice.call(arguments);
     }, { 'object': a });
 
-    expected = [a.b.c, 'c', a.b];
-    deepEqual(actual, expected, 'callback arguments');
+    deepEqual(actual, [a.b.c, 'c', a.b], 'callback arguments');
 
     actual = spotlight.custom('type');
     strictEqual(actual, null, 'incorrect argument');
@@ -354,58 +333,41 @@
 
   test('spotlight.runInContext', 1, function() {
     var actual,
-        expected,
-        value = new String('a'),
-        customSpotlight = spotlight.runInContext({
-          'console': {
-            'log': function(value, _) {
-              actual = value;
-            }
-          },
-          '_': _
-        });
+        value = new String('a');
 
-    expected = '<object>.b.c -> (string)';
+    var customSpotlight = spotlight.runInContext({
+      '_': _,
+      'console': { 'log': function(value, _) { actual = value; } }
+    });
 
     customSpotlight.byValue(value, {
       'object': { 'b': { 'c': value } }
     });
 
-    deepEqual(actual, expected);
+    deepEqual(actual, '<object>.b.c -> (string)');
   });
 
   /*--------------------------------------------------------------------------*/
 
   test('spotlight.debug', 2, function() {
-    var actual,
-        expected,
-        value = new String('a'),
-        customSpotlight = spotlight.runInContext({
-          'console': {
-            'log': function() {
-              // no-op function
-            }
-          },
-          '_': _
-        });
+    var value = new String('a');
 
-    expected = ['<object>.b.c -> (string)'];
+    var customSpotlight = spotlight.runInContext({
+      '_': _,
+      'console': { 'log': function() {} }
+    });
 
     customSpotlight.debug(true);
-    actual = simplify(customSpotlight.byValue(value, {
+
+    var actual = simplify(customSpotlight.byValue(value, {
       'object': { 'b': { 'c': value } }
     }));
 
-    deepEqual(actual, expected, 'spotlight.debug(true)');
-
-    expected = undefined;
+    deepEqual(actual, ['<object>.b.c -> (string)'], 'spotlight.debug(true)');
 
     customSpotlight.debug(false);
-    actual = customSpotlight.byValue(value, {
-      'object': { 'b': { 'c': value } }
-    });
-
-    strictEqual(actual, expected, 'spotlight.debug(false)');
+    actual = customSpotlight.byValue(value, { 'object': { 'b': { 'c': value } } });
+    strictEqual(actual, undefined, 'spotlight.debug(false)');
   });
 
   /*--------------------------------------------------------------------------*/
@@ -413,22 +375,18 @@
   test('for..in', 5, function() {
     root.a = { 'b': { 'valueOf': function() {} } };
 
-    var expected = ['<object>.b.valueOf -> (function)'],
-        actual = simplify(spotlight.byName('valueOf', { 'object': a }));
-
-    deepEqual(actual, expected, 'shadowed property');
+    var actual = simplify(spotlight.byName('valueOf', { 'object': a }));
+    deepEqual(actual, ['<object>.b.valueOf -> (function)'], 'shadowed property');
 
     root.a = { 'b': { 'toString': function() {} } };
 
-    expected = ['<object>.b.toString -> (function)'];
     actual = simplify(spotlight.byName('toString', { 'object': a }));
-    deepEqual(actual, expected, 'custom toString');
+    deepEqual(actual, ['<object>.b.toString -> (function)'], 'custom toString');
 
     root.a = {};
 
-    expected = [rootName + '.a -> (object)'];
     actual = simplify(spotlight.byName('a', { 'object': (root === root.window ? root.window : root) }));
-    deepEqual(actual.slice(0, 1), expected, 'Opera < 10.53 window');
+    deepEqual(actual.slice(0, 1), [rootName + '.a -> (object)'], 'Opera < 10.53 window');
 
     if (!Object.getOwnPropertyNames) {
       root.a = function() {};
