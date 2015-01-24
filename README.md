@@ -9,7 +9,7 @@ An object crawler/property search library that works on nearly all JavaScript pl
 
 ## Installation
 
-Spotlight.js’ only hard dependency is [Lo-Dash](https://lodash.com/).
+Spotlight.js’ only hard dependency is [lodash](https://lodash.com/).
 
 In a browser:
 
