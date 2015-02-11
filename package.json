@@ -16,9 +16,9 @@
     "lodash": "~2.4.1"
   },
   "devDependencies": {
-    "qunit-extras": "~1.4.1",
+    "qunit-extras": "~1.4.0",
     "qunitjs": "~1.17.0",
-    "requirejs": "~2.1.15"
+    "requirejs": "~2.1.0"
   },
   "files": [
     "spotlight.js"
