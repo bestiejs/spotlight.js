@@ -74,7 +74,7 @@
    * @returns {Object} Returns a new `spotlight` object.
    */
   function runInContext(context) {
-    // exit early if unable to acquire Lo-Dash
+    // Exit early if unable to acquire lodash.
     var _ = context && context._ || !freeDefine && req('lodash') || root._;
     if (!_) {
       return { 'runInContext': runInContext };
@@ -127,7 +127,7 @@
       'value': function(value, key, object) {
         return value === value
           ? object[key] === value
-          // special case for `NaN`
+          // Special case for `NaN`.
           : object[key] !== object[key];
       }
     };
@@ -137,7 +137,7 @@
 
       /** Detect ES5 property descriptor API */
       'descriptors' : (function() {
-        // IE 8 only accepts DOM elements
+        // IE 8 only accepts DOM elements.
         try {
           var o = {};
           setDescriptor(o, o, o);
@@ -162,19 +162,19 @@
     /** Used as the starting point(s) for the object crawler */
     var defaultRoots = [{ 'object': originalContext, 'path': 'window' }];
 
-    // set `defaultRoots` for CLI environments like Narwhal, Node.js, or RingoJS
+    // Set `defaultRoots` for CLI environments Node.js or RingoJS.
     if (freeGlobal) {
       defaultRoots = [{ 'object': freeGlobal, 'path': 'global' }];
-      // for the Narwhal REPL
+      // For the Narwhal REPL.
       if (originalContext != freeGlobal) {
         defaultRoots.unshift({ 'object': originalContext, 'path': '<module scope>' });
       }
-      // avoid explicitly crawling `exports` if it's crawled indirectly
+      // Avoid explicitly crawling `exports` if it's crawled indirectly.
       if (!(freeGlobal.exports == freeExports || context.exports == freeExports)) {
         defaultRoots.unshift({ 'object': freeExports, 'path': 'exports' });
       }
     }
-    // for Rhino
+    // For Rhino.
     else if (isHostType(context, 'environment') && isHostType(context, 'java')) {
       defaultRoots[0].path = '<global object>';
     }
@@ -192,8 +192,8 @@
       object = Object(object);
 
       try {
-        // avoid problems with iterators
-        // https://github.com/ringo/ringojs/issues/157
+        // Avoid problems with iterators.
+        // See https://github.com/ringo/ringojs/issues/157 for more details.
         if (support.iterators && _.isFunction(object.__iterator__)) {
           var iterator = support.descriptors
             ? getDescriptor(object, '__iterator__')
@@ -212,8 +212,8 @@
             object.__iterator__ = iterator;
           }
         }
-        // some objects like Firefox 3's `XPCSafeJSObjectWrapper.prototype` may
-        // throw errors when attempting to iterate over them
+        // Some objects like Firefox 3's `XPCSafeJSObjectWrapper.prototype` may
+        // throw errors when attempting to iterate over them.
         else {
           for (var key in object) {
             break;
@@ -224,7 +224,7 @@
       }
       if (iterator) {
         for (key in object) {
-          // iterators will assign an array to `key`
+          // Iterators will assign an array to `key`.
           callback(key[1], key[0]);
         }
       }
@@ -234,8 +234,8 @@
             length = props.length;
 
         while (++index < length) {
-          // some properties like Firefox's `console.constructor` or IE's
-          // `element.offsetParent` may throw errors when accessed
+          // Some properties like Firefox's `console.constructor` or IE's
+          // `element.offsetParent` may throw errors when accessed.
           try {
             key = props[index];
             var value = object[key];
@@ -284,8 +284,8 @@
         result = 'Global';
       }
       else if (_.isFunction(value) && isHostType(value, 'prototype')) {
-        // a function is assumed of kind "Constructor" if it has its own
-        // enumerable prototype properties or doesn't have a `[[Class]]` of Object
+        // A function is assumed of kind "Constructor" if it has its own
+        // enumerable prototype properties or doesn't have a `[[Class]]` of Object.
         try {
           if (getClass(value.prototype) == 'Object') {
             for (var key in value.prototype) {
@@ -376,15 +376,15 @@
           path = options.path,
           result = [];
 
-      // resolve object roots
+      // Resolve object roots.
       if (object) {
-        // resolve `undefined` path
+        // Resolve `undefined` path.
         if (path == null) {
           path = _.result(_.find(roots, { 'object': object }), 'path') || '<object>';
         }
         roots = [{ 'object': object, 'path': path }];
       }
-      // crawl all root objects
+      // Crawl all root objects.
       while ((data = roots.pop())) {
         index = 0;
         object = data.object;
@@ -392,33 +392,34 @@
         data = { 'object': object, 'path': path, 'pool': [object] };
         queue = [];
 
-        // a non-recursive solution to avoid call stack limits
-        // http://www.jslab.dk/articles/non.recursive.preorder.traversal.part4
+        // A non-recursive solution to avoid call stack limits.
+        // See http://www.jslab.dk/articles/non.recursive.preorder.traversal.part4
+        // for more details.
         do {
           object = data.object;
           path = data.path;
           separator = path ? '.' : '';
 
           forOwn(object, function(value, key) {
-            // (IE may throw errors coercing properties like `window.external` or `window.navigator`)
+            // IE may throw errors coercing properties like `window.external` or `window.navigator`.
             try {
-              // inspect objects
+              // Inspect objects.
               if (_.isPlainObject(value)) {
-                // clone current pool per prop on the current `object` to avoid
-                // sibling properties from polluting each others object pools
+                // Clone current pool per prop on the current `object` to avoid
+                // sibling properties from polluting each others object pools.
                 pool = data.pool.slice();
 
-                // check if already pooled (prevents infinite loops when handling circular references)
+                // Check if already pooled (prevents infinite loops when handling circular references).
                 pooled = _.find(pool, function(data) {
                   return value == data.object;
                 });
-                // add to the "call" queue
+                // Add to the "call" queue.
                 if (!pooled) {
                   pool.push({ 'object': value, 'path': path + separator + key, 'pool': pool });
                   queue.push(_.last(pool));
                 }
               }
-              // if filter passed, log it
+              // If filter passed, log it.
               if (
                 isCustom
                   ? callbackArg.call(data, value, key, object)
@@ -454,7 +455,7 @@
           phantom = isHostType(context, 'phantom') && context.phantom,
           JSON = isHostType(context, 'JSON') && _.isFunction(context.JSON && context.JSON.stringify) && context.JSON;
 
-      // lazy define
+      // Lazy define `log`.
       log = function(type, message, value) {
         var argCount = defaultCount,
             method = 'log';
@@ -467,9 +468,9 @@
             message = type + ': ' + message;
           }
         }
-        // avoid logging if in debug mode and running from the CLI
+        // Avoid logging if in debug mode and running from the CLI.
         if (!isDebug || (document && !phantom)) {
-          // because `console.log` is a host method we don't assume `.apply()` exists
+          // Because `console.log` is a host method we don't assume `apply` exists.
           if (argCount < 2) {
             if (JSON) {
               value = [JSON.stringify(value), value];
@@ -482,15 +483,15 @@
         }
       };
 
-      // for Narwhal, Rhino, or RingoJS
+      // For Rhino or RingoJS.
       if (!console && !document && _.isFunction(context.print)) {
         console = { 'log': print };
       }
-      // use noop for no log support
+      // Use noop for no log support.
       if (!isHostType(console, 'log')) {
         log = function() {};
       }
-      // avoid Safari 2 crash bug when passing more than 1 argument
+      // Avoid Safari 2 crash bug when passing more than 1 argument.
       else if (console.log.length == 1) {
         defaultCount = 1;
       }
@@ -635,21 +636,21 @@
 
   /*--------------------------------------------------------------------------*/
 
-  // export spotlight
+  // Export spotlight.
   var spotlight = runInContext();
 
-  // some AMD build optimizers like r.js check for condition patterns like the following:
+  // Some AMD build optimizers like r.js check for condition patterns like the following:
   if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
-    // define as an anonymous module so, through path mapping, it can be aliased
+    // Define as an anonymous module so, through path mapping, it can be aliased.
     define(['lodash'], function(_) {
       return runInContext({
         '_': _
       });
     });
   }
-  // check for `exports` after `define` in case a build optimizer adds an `exports` object
+  // Check for `exports` after `define` in case a build optimizer adds an `exports` object.
   else if (freeExports && freeModule) {
-    // in Narwhal, Node.js, Rhino -require, or RingoJS
+    // In Node.js, RhingoJS, or Rhino with CommonJS support.
     freeExports.byKind = spotlight.byKind;
     freeExports.byName = spotlight.byName;
     freeExports.byValue = spotlight.byValue;
@@ -659,7 +660,7 @@
     freeExports.version = spotlight.version;
   }
   else {
-    // in a browser or Rhino
+    // In a browser or Rhino.
     root.spotlight = spotlight;
   }
 }.call(this));
