@@ -1,66 +1,66 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<title>Spotlight.js Test Suite</title>
-		<link rel="stylesheet" href="../node_modules/qunitjs/qunit/qunit.css">
-	</head>
-	<body>
-		<div id="qunit"></div>
-		<script src="../node_modules/qunitjs/qunit/qunit.js"></script>
-		<script src="../node_modules/qunit-extras/qunit-extras.js"></script>
-		<script src="../node_modules/lodash/dist/lodash.compat.js"></script>
-		<script src="../spotlight.js"></script>
-		<script>
-			QUnit.config.hidepassed = true;
-			QUnit.urlParams.norequire = /[?&]norequire=true(?:&|$)/.test(location.search);
+  <head>
+    <meta charset="utf-8">
+    <title>Spotlight.js Test Suite</title>
+    <link rel="stylesheet" href="../node_modules/qunitjs/qunit/qunit.css">
+  </head>
+  <body>
+    <div id="qunit"></div>
+    <script src="../node_modules/qunitjs/qunit/qunit.js"></script>
+    <script src="../node_modules/qunit-extras/qunit-extras.js"></script>
+    <script src="../node_modules/lodash/index.js"></script>
+    <script src="../spotlight.js"></script>
+    <script>
+      QUnit.config.hidepassed = true;
+      QUnit.urlParams.norequire = /[?&]norequire=true(?:&|$)/.test(location.search);
 
-			// load test.js if not using require.js
-			document.write(QUnit.urlParams.norequire
-				? '<script src="test.js"><\/script>'
-				: '<script src="../node_modules/requirejs/require.js"><\/script>'
-			);
-		</script>
-		<script>
-			var spotlightModule;
+      // load test.js if not using require.js
+      document.write(QUnit.urlParams.norequire
+        ? '<script src="test.js"><\/script>'
+        : '<script src="../node_modules/requirejs/require.js"><\/script>'
+      );
+    </script>
+    <script>
+      var spotlightModule;
 
-			(function() {
-				if (!window.require) {
-					return;
-				}
-				QUnit.config.autostart = false;
+      (function() {
+        if (!window.require) {
+          return;
+        }
+        QUnit.config.autostart = false;
 
-				requirejs.config({
-					'baseUrl': './',
-					'urlArgs': 't=' + (+new Date),
-					'waitSeconds': 0,
-					'packages': [
-						{
-							'name': 'spotlight',
-							'location': '..',
-							'main': 'spotlight'
-						},
-						{
-							'name': 'lodash',
-							'location': '../node_modules/lodash/dist',
-							'main': 'lodash.compat'
-						},
-						{
-							'name': 'test',
-							'location': '.',
-							'main': 'test'
-						}
-					]
-				});
+        requirejs.config({
+          'baseUrl': './',
+          'urlArgs': 't=' + (+new Date),
+          'waitSeconds': 0,
+          'packages': [
+            {
+              'name': 'spotlight',
+              'location': '..',
+              'main': 'spotlight'
+            },
+            {
+              'name': 'lodash',
+              'location': '../node_modules/lodash',
+              'main': 'index'
+            },
+            {
+              'name': 'test',
+              'location': '.',
+              'main': 'test'
+            }
+          ]
+        });
 
-				// load spotlight as a module
-				require(['spotlight'], function(spotlight) {
-					spotlightModule = spotlight;
-					require(['test.js'], function() {
-						QUnit.start();
-					});
-				});
-			}());
-		</script>
-	</body>
+        // load spotlight as a module
+        require(['spotlight'], function(spotlight) {
+          spotlightModule = spotlight;
+          require(['test.js'], function() {
+            QUnit.start();
+          });
+        });
+      }());
+    </script>
+  </body>
 </html>
