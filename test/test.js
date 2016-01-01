@@ -28,14 +28,14 @@
   ));
 
   /** Load QUnit Extras. */
-  var qa = load('../node_modules/qunit-extras/qunit-extras.js');
-  if (qa) {
-    qa.runInContext(root);
+  var QUnitExtras = load('../node_modules/qunit-extras/qunit-extras.js');
+  if (QUnitExtras) {
+    QUnitExtras.runInContext(root);
   }
 
   /** The `lodash` utility function */
   var _ = root._ || (root._ = (
-    _ = load('../node_modules/lodash/dist/lodash.compat.js') || root._,
+    _ = load('../node_modules/lodash/index.js') || root._,
     _ = _._ || _,
     _.runInContext(root)
   ));
@@ -76,12 +76,13 @@
    * Skips a given number of tests with a passing result.
    *
    * @private
+   * @param {Object} assert The QUnit assert object.
    * @param {number} [count=1] The number of tests to skip.
    */
-  function skipTest(count) {
+  function skipTest(assert, count) {
     count || (count = 1);
     while (count--) {
-      ok(true, 'test skipped');
+      assert.ok(true, 'test skipped');
     }
   }
 
@@ -99,26 +100,28 @@
     root.a = undefined;
   });
 
-  // explicitly call `QUnit.module()` instead of `module()`
-  // in case we are in a CLI environment
   QUnit.module('spotlight');
 
-  test('method options', 3, function() {
+  QUnit.test('method options', function(assert) {
+    assert.expect(3);
+
     root.a = { 'a': { 'a': { 'b': { 'c': 12 } } } };
 
     var actual = simplify(spotlight.byName('a', { 'object': a.a, 'path': '<path>' }));
-    deepEqual(actual, ['<path>.a -> (object)'], 'passing options');
+    assert.deepEqual(actual, ['<path>.a -> (object)'], 'passing options');
 
     actual = simplify(spotlight.byName('a', { 'object': a.a, 'path': '' }));
-    deepEqual(actual, ['a -> (object)'], 'path as ""');
+    assert.deepEqual(actual, ['a -> (object)'], 'path as ""');
 
     actual = simplify(spotlight.byName('a', { 'object': a.a }));
-    deepEqual(actual, ['<object>.a -> (object)'], 'no path');
+    assert.deepEqual(actual, ['<object>.a -> (object)'], 'no path');
   });
 
   /*--------------------------------------------------------------------------*/
 
-  test('custom __iterator__', 5, function() {
+  QUnit.test('custom __iterator__', function(assert) {
+    assert.expect(5);
+
     var skipped = 5,
         getDescriptor = Object.getOwnPropertyDescriptor,
         setDescriptor = Object.defineProperty;
@@ -149,7 +152,7 @@
       a.b.next = a.b.__iterator__ = function() {};
 
       var actual = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
-      deepEqual(actual, ['a.b.y -> (number)'], 'custom __iterator__');
+      assert.deepEqual(actual, ['a.b.y -> (number)'], 'custom __iterator__');
 
       if (has.descriptors) {
         skipped = 0;
@@ -158,14 +161,14 @@
         setDescriptor(a.b, '__iterator__', { 'writable': true, 'value': noop });
 
         actual = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
-        deepEqual(actual, ['a.b.y -> (number)'], 'non-configurable __iterator__');
+        assert.deepEqual(actual, ['a.b.y -> (number)'], 'non-configurable __iterator__');
 
         root.a = { 'b': { 'x': 1, 'y': 1, 'z': 1 } };
         setDescriptor(a.b, '__iterator__', { 'configurable': true, 'value': noop });
 
         actual = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
-        deepEqual(actual, ['a.b.y -> (number)'], 'non-writable __iterator__');
-        deepEqual(getDescriptor(a.b, '__iterator__'), {
+        assert.deepEqual(actual, ['a.b.y -> (number)'], 'non-writable __iterator__');
+        assert.deepEqual(getDescriptor(a.b, '__iterator__'), {
           'configurable': true,
           'enumerable': false,
           'writable': false,
@@ -176,61 +179,65 @@
         setDescriptor(a.b, '__iterator__', { 'value': noop });
 
         actual = simplify(spotlight.byName('y', { 'object': a, 'path': 'a' }));
-        deepEqual(actual, [], 'non-configurable/writable __iterator__');
+        assert.deepEqual(actual, [], 'non-configurable/writable __iterator__');
       }
     }
-    skipTest(skipped);
+    skipTest(assert, skipped);
   });
 
   /*--------------------------------------------------------------------------*/
 
-  test('spotlight.byKind', 8, function() {
+  QUnit.test('spotlight.byKind', function(assert) {
+    assert.expect(8);
+
     function Klass() {}
     root.a = { 'b': { 'c': new Klass } };
 
     var actual = simplify(spotlight.byKind(Klass));
-    deepEqual(actual.slice(0, 1), [rootName + '.a.b.c -> (object)'], 'Klass instance');
+    assert.deepEqual(actual.slice(0, 1), [rootName + '.a.b.c -> (object)'], 'Klass instance');
 
     root.a = { 'b': { 'c': [] } };
 
     actual = simplify(spotlight.byKind('Array', { 'object': a }));
-    deepEqual(actual, ['<object>.b.c -> (array)'], '[[Class]]');
+    assert.deepEqual(actual, ['<object>.b.c -> (array)'], '[[Class]]');
 
     actual = simplify(spotlight.byKind('array', { 'object': a }));
-    deepEqual(actual, ['<object>.b.c -> (array)'], 'lowercase [[Class]]');
+    assert.deepEqual(actual, ['<object>.b.c -> (array)'], 'lowercase [[Class]]');
 
     actual = simplify(spotlight.byKind('object', { 'object': a.b }));
-    deepEqual(actual, ['<object>.c -> (array)'], 'typeof');
+    assert.deepEqual(actual, ['<object>.c -> (array)'], 'typeof');
 
     actual = simplify(spotlight.byKind('Object', { 'object': a.b }));
-    deepEqual(actual, [], 'no-match [[Class]]');
+    assert.deepEqual(actual, [], 'no-match [[Class]]');
 
     root.a = { 'b': { 'c': null } };
 
     actual = simplify(spotlight.byKind('null', { 'object': a }));
-    deepEqual(actual, ['<object>.b.c -> (null)'], 'null');
+    assert.deepEqual(actual, ['<object>.b.c -> (null)'], 'null');
 
     root.a = { 'b': { 'c': undefined } };
 
     actual = simplify(spotlight.byKind('undefined', { 'object': a }));
-    deepEqual(actual, ['<object>.b.c -> (undefined)'], 'undefined');
+    assert.deepEqual(actual, ['<object>.b.c -> (undefined)'], 'undefined');
 
     actual = spotlight.byKind(null);
-    strictEqual(actual, null, 'incorrect argument');
+    assert.strictEqual(actual, null, 'incorrect argument');
   });
 
  /*--------------------------------------------------------------------------*/
 
-  test('spotlight.byName', 6, function() {
+  QUnit.test('spotlight.byName', function(assert) {
+    assert.expect(6);
+
     root.a = { 'b': { 'c': 12 } };
 
     var actual = simplify(spotlight.byName('c'));
-    deepEqual(actual.slice(0, 1), [rootName + '.a.b.c -> (number)'], 'basic');
+    assert.deepEqual(actual.slice(0, 1), [rootName + '.a.b.c -> (number)'], 'basic');
 
     root.a = { 'a': { 'a': { 'b': { 'c': 12 } } } };
 
     actual = simplify(spotlight.byName('c'));
-    deepEqual(actual.slice(0, 1), [rootName + '.a.a.a.b.c -> (number)'], 'repeated property names');
+    assert.deepEqual(actual.slice(0, 1), [rootName + '.a.a.a.b.c -> (number)'], 'repeated property names');
 
     root.a = { 'foo': { 'b': { 'foo': { 'c': { 'foo': 12 } } } } };
 
@@ -241,7 +248,7 @@
     ];
 
     actual = simplify(spotlight.byName('foo'));
-    deepEqual(actual.slice(0, 3), expected, 'multiple matches');
+    assert.deepEqual(actual.slice(0, 3), expected, 'multiple matches');
 
     root.a = {
       'foo': { 'b': { 'foo': { 'c': {} } } },
@@ -263,7 +270,7 @@
       return /a\.foo/.test(value);
     });
 
-    deepEqual(filtered.sort(), expected, 'circular references');
+    assert.deepEqual(filtered.sort(), expected, 'circular references');
 
     expected = [
       rootName + '.a.bar.b.foo -> (object)',
@@ -274,35 +281,39 @@
       return /a\.bar/.test(value);
     });
 
-    deepEqual(filtered.sort(), expected, 'sibling containing circular references');
+    assert.deepEqual(filtered.sort(), expected, 'sibling containing circular references');
 
     actual = spotlight.byName(12);
-    strictEqual(actual, null, 'incorrect argument');
+    assert.strictEqual(actual, null, 'incorrect argument');
   });
 
   /*--------------------------------------------------------------------------*/
 
-  test('spotlight.byValue', 3, function() {
+  QUnit.test('spotlight.byValue', function(assert) {
+    assert.expect(3);
+
     var value = new String('a');
     root.a = { 'b': { 'c': value } };
 
     var actual = simplify(spotlight.byValue(value));
-    deepEqual(actual.slice(0, 1), [rootName + '.a.b.c -> (string)'], 'basic');
+    assert.deepEqual(actual.slice(0, 1), [rootName + '.a.b.c -> (string)'], 'basic');
 
     root.a = { 'b': { 'c': 12 } };
 
     actual = simplify(spotlight.byValue('12', { 'object': a }));
-    deepEqual(actual, [], 'strict match');
+    assert.deepEqual(actual, [], 'strict match');
 
     root.a = { 'b': { 'c': NaN } };
 
     actual = simplify(spotlight.byValue(NaN, { 'object': a }));
-    deepEqual(actual, ['<object>.b.c -> (number)'], '`NaN`');
+    assert.deepEqual(actual, ['<object>.b.c -> (number)'], '`NaN`');
   });
 
   /*--------------------------------------------------------------------------*/
 
-  test('spotlight.custom', 3, function() {
+  QUnit.test('spotlight.custom', function(assert) {
+    assert.expect(3);
+
     var now = String(+new Date);
     root.a = { 'b': { 'c': +now } };
 
@@ -312,21 +323,23 @@
       return typeof value == 'number' && value == now;
     }, { 'object': a }));
 
-    deepEqual(actual.slice(0, 1), ['<object>.b.c -> (number)'], 'basic');
+    assert.deepEqual(actual.slice(0, 1), ['<object>.b.c -> (number)'], 'basic');
 
     spotlight.custom(function() {
       actual = slice.call(arguments);
     }, { 'object': a });
 
-    deepEqual(actual, [a.b.c, 'c', a.b], 'callback arguments');
+    assert.deepEqual(actual, [a.b.c, 'c', a.b], 'callback arguments');
 
     actual = spotlight.custom('type');
-    strictEqual(actual, null, 'incorrect argument');
+    assert.strictEqual(actual, null, 'incorrect argument');
   });
 
   /*--------------------------------------------------------------------------*/
 
-  test('spotlight.runInContext', 1, function() {
+  QUnit.test('spotlight.runInContext', function(assert) {
+    assert.expect(1);
+
     var actual,
         value = new String('a');
 
@@ -339,12 +352,14 @@
       'object': { 'b': { 'c': value } }
     });
 
-    deepEqual(actual, '<object>.b.c -> (string)');
+    assert.deepEqual(actual, '<object>.b.c -> (string)');
   });
 
   /*--------------------------------------------------------------------------*/
 
-  test('spotlight.debug', 2, function() {
+  QUnit.test('spotlight.debug', function(assert) {
+    assert.expect(2);
+
     var value = new String('a');
 
     var customSpotlight = spotlight.runInContext({
@@ -358,66 +373,66 @@
       'object': { 'b': { 'c': value } }
     }));
 
-    deepEqual(actual, ['<object>.b.c -> (string)'], 'spotlight.debug(true)');
+    assert.deepEqual(actual, ['<object>.b.c -> (string)'], 'spotlight.debug(true)');
 
     customSpotlight.debug(false);
     actual = customSpotlight.byValue(value, { 'object': { 'b': { 'c': value } } });
-    strictEqual(actual, undefined, 'spotlight.debug(false)');
+    assert.strictEqual(actual, undefined, 'spotlight.debug(false)');
   });
 
   /*--------------------------------------------------------------------------*/
 
-  test('for..in', 5, function() {
+  QUnit.test('for..in', function(assert) {
+    assert.expect(5);
+
     root.a = { 'b': { 'valueOf': function() {} } };
 
     var actual = simplify(spotlight.byName('valueOf', { 'object': a }));
-    deepEqual(actual, ['<object>.b.valueOf -> (function)'], 'shadowed property');
+    assert.deepEqual(actual, ['<object>.b.valueOf -> (function)'], 'shadowed property');
 
     root.a = { 'b': { 'toString': function() {} } };
 
     actual = simplify(spotlight.byName('toString', { 'object': a }));
-    deepEqual(actual, ['<object>.b.toString -> (function)'], 'custom toString');
+    assert.deepEqual(actual, ['<object>.b.toString -> (function)'], 'custom toString');
 
     root.a = {};
 
     actual = simplify(spotlight.byName('a', { 'object': (root === root.window ? root.window : root) }));
-    deepEqual(actual.slice(0, 1), [rootName + '.a -> (object)'], 'Opera < 10.53 window');
+    assert.deepEqual(actual.slice(0, 1), [rootName + '.a -> (object)'], 'Opera < 10.53 window');
 
     if (!Object.getOwnPropertyNames) {
       root.a = function() {};
 
       actual = simplify(spotlight.byName('prototype', { 'object': a }));
-      deepEqual(actual, [], 'skips prototype');
+      assert.deepEqual(actual, [], 'skips prototype');
 
       actual = simplify(spotlight.byName('constructor', { 'object': a.prototype, 'path': 'a.prototype' }));
-      deepEqual(actual, [], 'IE < 9 prototype.constructor');
+      assert.deepEqual(actual, [], 'IE < 9 prototype.constructor');
     }
     else {
-      skipTest(2);
+      skipTest(assert, 2);
     }
   });
 
   /*--------------------------------------------------------------------------*/
 
-  test('supports loading Spotlight.js as a module', 1, function() {
+  QUnit.test('supports loading Spotlight.js as a module', function(assert) {
+    assert.expect(1);
+
     if (amd) {
-      strictEqual((spotlightModule || {}).version, spotlight.version);
+      assert.strictEqual((spotlightModule || {}).version, spotlight.version);
     }
     else {
-      skipTest();
+      skipTest(assert);
     }
   });
 
   /*--------------------------------------------------------------------------*/
 
-  if (document) {
-    QUnit.begin(function() {
-      QUnit.config.hidepassed = true;
-      document.getElementById('qunit-tests').className += ' hidepass';
-      document.getElementById('qunit-urlconfig-hidepassed').checked = true;
-    });
-  } else {
-    QUnit.config.hidepassed = true;
+  QUnit.config.asyncRetries = 10;
+  QUnit.config.hidepassed = true;
+
+  if (!document) {
     QUnit.config.noglobals = true;
     QUnit.load();
   }
