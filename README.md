@@ -78,7 +78,7 @@ spotlight.custom(function(value) { return !value; });
 
 ## Support
 
-Tested in Chrome 38-39, Firefox 33-34, IE 6-11, Opera 25-26, Safari 5-8, Node.js 0.8.26~0.10.35, PhantomJS 1.9.8, RingoJS 0.11, & Rhino 1.7RC5.
+Tested in Chrome 46-47, Firefox 42-43, IE 9-11, Edge 13, Safari 8-9, Node.js 0.10.x, 0.12.x, 4.x, & 5.x, & PhantomJS 1.9.8.
 
 ## BestieJS
 
