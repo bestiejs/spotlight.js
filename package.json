@@ -1,6 +1,6 @@
 {
   "name": "spotlight",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "An object crawler/property search library that works on nearly all JavaScript platforms.",
   "license": "MIT",
   "main": "spotlight.js",

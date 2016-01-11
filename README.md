@@ -1,25 +1,23 @@
-# Spotlight.js v1.1.0
+# Spotlight.js v1.2.0
 
 An object crawler/property search library that works on nearly all JavaScript platforms.
 
 ## Documentation
 
-* [doc/README.md](https://github.com/bestiejs/spotlight.js/blob/master/doc/README.md#readme)
-* [wiki/Roadmap](https://github.com/bestiejs/spotlight.js/wiki/Roadmap)
+* [API Documentation](https://github.com/bestiejs/spotlight.js/blob/1.2.0/doc/README.md)
+* [Roadmap](https://github.com/bestiejs/spotlight.js/wiki/Roadmap)
 
 ## Installation
 
 Spotlight.js’ only hard dependency is [lodash](https://lodash.com/).
 
 In a browser:
-
 ```html
 <script src="lodash.js"></script>
 <script src="spotlight.js"></script>
 ```
 
 In an AMD loader:
-
 ```js
 require({
   'paths': {
@@ -31,19 +29,16 @@ require({
 ```
 
 Using npm:
-
 ```bash
 $ npm i --save spotlight
 ```
 
 In Node.js:
-
 ```js
 var spotlight = require('spotlight');
 ```
 
 Usage example:
-
 ```js
 // find all "length" properties
 spotlight.byName('length');
@@ -78,7 +73,7 @@ spotlight.custom(function(value) { return !value; });
 
 ## Support
 
-Tested in Chrome 46-47, Firefox 42-43, IE 9-11, Edge 13, Safari 8-9, Node.js 0.10.x, 0.12.x, 4.x, & 5.x, & PhantomJS 1.9.8.
+Tested in Chrome 46-47, Firefox 42-43, IE 9-11, Edge 13, Safari 8-9, Node.js 0.10, 0.12, 4, & 5, & PhantomJS 1.9.8.
 
 ## BestieJS
 

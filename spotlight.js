@@ -1,5 +1,5 @@
 /*!
- * Spotlight.js v1.1.0 <https://github.com/bestiejs/spotlight.js/>
+ * Spotlight.js v1.2.0 <https://github.com/bestiejs/spotlight.js/>
  * Copyright 2011-2016 John-David Dalton <http://allyoucanleet.com/>
  * Based on Waldo <https://github.com/angus-c/waldo/>,
  * Copyright 2011-2016 Angus Croll <http://javascriptweblog.wordpress.com/>
@@ -622,7 +622,7 @@
      * @memberOf spotlight
      * @type string
      */
-    spotlight.version = '1.1.0';
+    spotlight.version = '1.2.0';
 
     spotlight.byKind = byKind;
     spotlight.byName = byName;
