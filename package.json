@@ -16,7 +16,7 @@
     "lodash": "^3.10.1"
   },
   "devDependencies": {
-    "docdown": "~0.3.0",
+    "docdown": "~0.4.1",
     "qunit-extras": "^1.4.5",
     "qunitjs": "~1.20.0",
     "requirejs": "^2.1.22"
