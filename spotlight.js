@@ -1,5 +1,5 @@
 /*!
- * Spotlight.js v1.2.0 <https://github.com/bestiejs/spotlight.js/>
+ * Spotlight.js <https://github.com/bestiejs/spotlight.js/>
  * Copyright 2011-2016 John-David Dalton <http://allyoucanleet.com/>
  * Based on Waldo <https://github.com/angus-c/waldo/>,
  * Copyright 2011-2016 Angus Croll <http://javascriptweblog.wordpress.com/>
