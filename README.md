@@ -29,7 +29,7 @@ require({
 ```
 
 Using npm:
-```bash
+```shell
 $ npm i --save spotlight
 ```
 
