@@ -11,7 +11,9 @@
     "Benjamin Tan <demoneaux@gmail.com> (https://d10.github.io/)"
   ],
   "repository": "bestiejs/spotlight.js",
-  "scripts": { "test": "echo \"See the repository CONTRIBUTING.md for testing instructions.\"" },
+  "scripts": {
+    "test": "echo \"See the repository CONTRIBUTING.md for testing instructions.\""
+  },
   "dependencies": {
     "lodash": "^3.10.1"
   },
