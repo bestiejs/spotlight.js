@@ -1,9 +1,9 @@
 /*!
- * Spotlight.js <https://github.com/bestiejs/spotlight.js/>
- * Copyright 2011-2016 John-David Dalton <http://allyoucanleet.com/>
- * Based on Waldo <https://github.com/angus-c/waldo/>,
- * Copyright 2011-2016 Angus Croll <http://javascriptweblog.wordpress.com/>
- * Both available under MIT license <http://mths.be/mit>
+ * Spotlight.js
+ * Copyright 2011-2016 John-David Dalton
+ * Based on Waldo,
+ * Copyright 2011-2016 Angus Croll
+ * Both available under MIT license
  */
 ;(function() {
   'use strict';

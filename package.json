@@ -5,10 +5,10 @@
   "license": "MIT",
   "main": "spotlight.js",
   "keywords": "crawl, find, search, utility",
-  "author": "John-David Dalton <john.david.dalton@gmail.com> (http://allyoucanleet.com/)",
+  "author": "John-David Dalton <john.david.dalton@gmail.com>",
   "contributors": [
-    "John-David Dalton <john.david.dalton@gmail.com> (http://allyoucanleet.com/)",
-    "Benjamin Tan <demoneaux@gmail.com> (https://d10.github.io/)"
+    "John-David Dalton <john.david.dalton@gmail.com>",
+    "Benjamin Tan <demoneaux@gmail.com>"
   ],
   "repository": "bestiejs/spotlight.js",
   "scripts": {
